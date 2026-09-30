@@ -1,0 +1,6 @@
+{
+  "appId": "com.rakibapps.electricalloadcalculator",
+  "appName": "Electrical Load Calculator",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}

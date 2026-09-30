@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electrical Load & Wiring Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap');
+        body { font-family: 'Hind Siliguri', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-p-4">
+
+    <div class="max-w-4xl mx-auto p-4 sm:p-6">
+        <header class="text-center mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+            <h1 class="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">⚡ ইলেকট্রিক্যাল ওয়্যারিং ও লোড ক্যালকুলেটর</h1>
+            <p class="text-slate-500 text-sm">অ্যাপ্লায়েন্স সংখ্যা ও ওয়াট হিসাব করে তার (RM) ও সার্কিট ব্রেকার (MCB/RCCB) হিসাব করুন।</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="md:col-span-2 space-y-6">
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                    <label class="block font-semibold text-slate-700 mb-2">রুমের নাম বা সেকশন:</label>
+                    <input type="text" id="roomName" value="মেইন রুম / সম্পূর্ণ বাড়ি"
+                        class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+                    <h2 class="font-bold text-lg text-slate-700 border-b pb-2">এপ্লায়েন্স ও লোড তালিকা</h2>
+
+                    <div id="appliancesContainer" class="space-y-4"></div>
+
+                    <button onclick="addApplianceRow()"
+                        class="mt-3 px-4 py-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 font-medium rounded-xl text-sm transition flex items-center gap-2">
+                        ➕ নতুন ডিভাইস যোগ করুন
+                    </button>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+                    <h2 class="font-bold text-lg text-slate-700 border-b pb-2">সুরক্ষা ডিভাইস (Protection)</h2>
+
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" id="useRccb" checked
+                            class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500">
+                        <label for="useRccb" class="font-medium text-slate-700 cursor-pointer">
+                            RCCB (Residual Current Circuit Breaker) ব্যবহার করবেন?
+                        </label>
+                    </div>
+                </div>
+
+                <button onclick="calculateLoad()"
+                    class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-200 transition">
+                    হিসাব করুন (Calculate)
+                </button>
+            </div>
+
+            <div class="md:col-span-1">
+                <div class="bg-amber-50/70 border border-amber-200/80 p-5 rounded-2xl shadow-sm sticky top-4">
+                    <div class="flex items-center justify-between border-b border-amber-200 pb-3 mb-4">
+                        <h2 class="font-bold text-lg text-amber-900">📓 নোটবুক রিপোর্ট</h2>
+                        <span class="text-xs bg-amber-200 text-amber-800 px-2 py-1 rounded-md font-medium">অটো জেনারেটেড</span>
+                    </div>
+
+                    <div id="outputContent" class="space-y-4 text-sm text-slate-700">
+                        <p class="text-slate-400 italic text-center py-8">
+                            বাম পাশ থেকে ডিভাইসের সংখ্যা ও ওয়াট দিয়ে 'হিসাব করুন' বাটনে চাপ দিন।
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+const defaultItems = [
+    { name: "লাইট (Light)", defaultWatt: 15, qty: 2 },
+    { name: "ফ্যান (Fan)", defaultWatt: 75, qty: 1 },
+    { name: "রাইস কুকার (Rice Cooker)", defaultWatt: 1000, qty: 0 },
+    { name: "ফ্রিজ (Refrigerator)", defaultWatt: 300, qty: 0 },
+    { name: "টিভি (TV)", defaultWatt: 120, qty: 0 }
+];
+
+function initApp() {
+    const container = document.getElementById('appliancesContainer');
+    container.innerHTML = '';
+    defaultItems.forEach(item => {
+        addApplianceRow(item.name, item.defaultWatt, item.qty);
+    });
+}
+
+function addApplianceRow(name = "অন্যান্য ডিভাইস", watt = 100, qty = 0) {
+    const container = document.getElementById('appliancesContainer');
+    const rowId = 'row_' + Math.random().toString(36).substr(2, 9);
+
+    let wattOptions = '';
+    [5, 10, 15, 20, 30, 40, 50, 60, 75, 100, 120, 150, 200, 500, 1000, 1500, 2000]
+        .forEach(w => {
+            wattOptions += `<option value="${w}" ${w === watt ? 'selected' : ''}>${w} ওয়াট</option>`;
+        });
+
+    const html = `
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200 items-center row-item" id="${rowId}">
+            <div class="sm:col-span-4">
+                <input type="text" value="${name}" placeholder="নাম"
+                    class="w-full px-3 py-1.5 bg-white border rounded-lg text-sm itemName">
+            </div>
+
+            <div class="sm:col-span-3">
+                <select class="w-full px-2 py-1.5 bg-white border rounded-lg text-sm itemWatt"
+                    onchange="checkCustomWatt(this)">
+                    ${wattOptions}
+                    <option value="custom">কাস্টম ওয়াট...</option>
+                </select>
+                <input type="number" placeholder="ওয়াট লিখুন"
+                    class="w-full mt-1 px-2 py-1 bg-white border rounded-lg text-sm customWattInput hidden"
+                    value="${watt}">
+            </div>
+
+            <div class="sm:col-span-3">
+                <div class="flex items-center gap-1">
+                    <span class="text-xs text-slate-500">সংখ্যা:</span>
+                    <input type="number" min="0" value="${qty}"
+                        class="w-full px-3 py-1.5 bg-white border rounded-lg text-sm itemQty">
+                </div>
+            </div>
+
+            <div class="sm:col-span-2 text-right">
+                <button onclick="document.getElementById('${rowId}').remove()"
+                    class="text-red-500 hover:text-red-700 text-xs px-2 py-1 bg-red-50 hover:bg-red-100 rounded">
+                    ডিলিট
+                </button>
+            </div>
+        </div>
+    `;
+
+    container.insertAdjacentHTML('beforeend', html);
+}
+
+function checkCustomWatt(selectEl) {
+    const customInput = selectEl.parentElement.querySelector('.customWattInput');
+    if (selectEl.value === 'custom') {
+        customInput.classList.remove('hidden');
+        customInput.focus();
+    } else {
+        customInput.classList.add('hidden');
+    }
+}
+
+function calculateLoad() {
+    const roomName = document.getElementById('roomName').value || "নির্দিষ্ট রুম";
+    const rows = document.querySelectorAll('.row-item');
+
+    let totalWatts = 0;
+    let summaryHTML = `
+        <div class="font-bold text-amber-900 border-b border-amber-200 pb-1 mb-2">
+            সেকশন: ${escapeHTML(roomName)}
+        </div>`;
+    let activeItemsCount = 0;
+
+    rows.forEach(row => {
+        const name = row.querySelector('.itemName').value;
+        const qty = parseInt(row.querySelector('.itemQty').value) || 0;
+
+        if (qty > 0) {
+            const selectEl = row.querySelector('.itemWatt');
+            let watt = 0;
+
+            if (selectEl.value === 'custom') {
+                watt = parseFloat(row.querySelector('.customWattInput').value) || 0;
+            } else {
+                watt = parseFloat(selectEl.value) || 0;
+            }
+
+            const subTotalWatt = qty * watt;
+            totalWatts += subTotalWatt;
+            activeItemsCount++;
+
+            summaryHTML += `
+                <div class="text-xs flex justify-between py-1 border-b border-amber-100 gap-2">
+                    <span>${escapeHTML(name)} (${qty}টি × ${watt}W)</span>
+                    <span class="font-semibold whitespace-nowrap">${subTotalWatt} W</span>
+                </div>`;
+        }
+    });
+
+    if (activeItemsCount === 0) {
+        document.getElementById('outputContent').innerHTML =
+            `<p class="text-red-500 text-center text-xs py-4">কমপক্ষে একটি ডিভাইসের সংখ্যা দিন!</p>`;
+        return;
+    }
+
+    const voltage = 220;
+    const totalAmps = totalWatts / voltage;
+
+    let wireSize = "1.5 RM";
+    if (totalAmps > 35) wireSize = "10.0 RM (বা তার বেশি)";
+    else if (totalAmps > 25) wireSize = "6.0 RM";
+    else if (totalAmps > 16) wireSize = "4.0 RM";
+    else if (totalAmps > 10) wireSize = "2.5 RM";
+
+    let mcbRating = "10 Amp MCB";
+    const standardMCBs = [6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100];
+
+    for (let mcb of standardMCBs) {
+        if (totalAmps * 1.25 <= mcb) {
+            mcbRating = mcb + " Amp MCB";
+            break;
+        }
+        mcbRating = "100+ Amp MCB";
+    }
+
+    const useRccb = document.getElementById('useRccb').checked;
+    let rccbText = "প্রযোজ্য নয় (বাদ দেওয়া হয়েছে)";
+
+    if (useRccb) {
+        let rccbAmp = 25;
+        if (totalAmps > 25 && totalAmps <= 40) rccbAmp = 40;
+        else if (totalAmps > 40) rccbAmp = 63;
+        rccbText = `হ্যাঁ (${rccbAmp} Amp, 30mA)`;
+    }
+
+    summaryHTML += `
+        <div class="mt-4 pt-3 border-t border-amber-200 space-y-2 text-xs">
+            <div class="flex justify-between font-bold text-slate-800 text-sm">
+                <span>মোট ওয়াট:</span>
+                <span class="text-blue-600">${totalWatts.toFixed(1)} ওয়াট</span>
+            </div>
+
+            <div class="flex justify-between font-bold text-slate-800 text-sm">
+                <span>মোট অ্যাম্পিয়ার:</span>
+                <span class="text-blue-600">${totalAmps.toFixed(2)} A</span>
+            </div>
+
+            <div class="bg-white p-3 rounded-xl border border-amber-200 space-y-1 mt-2">
+                <div class="flex justify-between">
+                    <span>তারের সাইজ (RM):</span>
+                    <span class="font-bold text-emerald-600">${wireSize}</span>
+                </div>
+
+                <div class="flex justify-between">
+                    <span>মেইন সার্কিট ব্রেকার (MCB):</span>
+                    <span class="font-bold text-purple-600">${mcbRating}</span>
+                </div>
+
+                <div class="flex justify-between">
+                    <span>RCCB প্রটেকশন:</span>
+                    <span class="font-bold text-indigo-600">${rccbText}</span>
+                </div>
+            </div>
+
+            <p class="text-[11px] text-slate-500 pt-2">
+                নোট: এটি আনুমানিক হিসাব। বাস্তব ইনস্টলেশনে কেবল/তার, MCB ও RCCB নির্বাচন
+                করার আগে স্থানীয় নিয়ম, কেবলের ধরন, দৈর্ঘ্য, ভোল্টেজ ড্রপ ও ইনস্টলেশন পদ্ধতি যাচাই করুন।
+            </p>
+        </div>
+    `;
+
+    document.getElementById('outputContent').innerHTML = summaryHTML;
+}
+
+function escapeHTML(value) {
+    const div = document.createElement('div');
+    div.textContent = value;
+    return div.innerHTML;
+}
+
+window.onload = initApp;
+</script>
+</body>
+</html>
