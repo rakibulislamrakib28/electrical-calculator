@@ -32,15 +32,15 @@
         <div class="p-4 overflow-y-auto space-y-4 text-sm text-slate-300 flex-1">
             <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700">
                 <h3 class="font-bold text-blue-300 mb-1">১. MCB (Circuit Breaker)</h3>
-                <p class="text-xs text-slate-400">ওভারলোড ও শর্টসার্কিট থেকে ঘর রক্ষা করে।</p>
+                <p class="text-xs text-slate-400">লোডের অ্যাম্পিয়ার অনুযায়ী ছোট-বড় (যেমন: 10A, 16A, 32A, 63A) ব্যবহার করতে হয়।</p>
             </div>
             <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700">
                 <h3 class="font-bold text-blue-300 mb-1">২. RCCB</h3>
-                <p class="text-xs text-slate-400">বৈদ্যুতিক শক ও লিকেজ থেকে রক্ষা করে।</p>
+                <p class="text-xs text-slate-400">মোট লোডের ওপর ভিত্তি করে 25A, 40A বা 63A (30mA) ক্ষমতার RCCB দিতে হয়।</p>
             </div>
             <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700">
                 <h3 class="font-bold text-blue-300 mb-1">৩. তার বা ক্যাবল (RM)</h3>
-                <p class="text-xs text-slate-400">লাইট-ফ্যানের জন্য ১.৫ RM, সকেট-ফ্রিজের জন্য ২.৫ RM এবং এসি বা হেভি লোডের জন্য ৪ RM বা তার বেশি।</p>
+                <p class="text-xs text-slate-400">লাইট-ফ্যানের জন্য ১.৫ RM, সকেট-ফ্রিজের জন্য ২.৫ RM এবং হেভি লোডের জন্য ৪ RM বা তার বেশি।</p>
             </div>
         </div>
     </div>
@@ -49,34 +49,41 @@
     <!-- Main Container -->
     <main class="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
         
-        <!-- Room Setup Section -->
+        <!-- Room Setup Section with Small Box Style -->
         <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-2xl shadow-xl backdrop-blur-md space-y-4">
             <h2 class="font-bold text-base text-blue-400 border-b border-slate-700 pb-2">🏠 ঘরের সংখ্যা ও রুম নির্বাচন</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">মোট কয়টি ঘর নিয়ে কাজ করবেন (যেমন: ৫ বা ১০):</label>
-                    <input type="number" id="roomCountInput" value="1" min="1" max="20" onchange="updateRoomCount()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white">
+                <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-700 flex flex-col justify-between">
+                    <label class="block text-xs text-slate-300 mb-2 font-medium">মোট কয়টি ঘর নিয়ে কাজ করবেন?</label>
+                    <input type="number" id="roomCountInput" value="1" min="1" max="20" onchange="updateRoomCount()" class="w-24 px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-white text-center font-bold">
                 </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">যে রুমের কাজ করবেন তা সিলেক্ট করুন:</label>
-                    <select id="roomSelector" onchange="switchRoom()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white">
+                <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-700 flex flex-col justify-between">
+                    <label class="block text-xs text-slate-300 mb-2 font-medium">যে রুমের কাজ করবেন তা সিলেক্ট করুন:</label>
+                    <select id="roomSelector" onchange="switchRoom()" class="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-white">
                         <option value="0">রুম ১</option>
                     </select>
                 </div>
             </div>
         </div>
 
-        <!-- Grid Section (Multiple items per row) -->
+        <!-- Appliances Grid Section (6 items per row style) -->
         <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-2xl shadow-xl backdrop-blur-md space-y-4">
             <h2 class="font-bold text-base text-blue-400 border-b border-slate-700 pb-2">💡 ডিভাইস সিলেক্ট করুন (ক্লিক করলেই ঘরে যুক্ত হবে)</h2>
-            <div id="appliancesGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <!-- Dynamically filled grid items -->
+            <div id="appliancesGrid" class="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                <!-- Dynamically filled with 6 items per row -->
+            </div>
+
+            <!-- Custom Add Item Section -->
+            <div class="pt-3 border-t border-slate-700 flex flex-col sm:flex-row gap-2 items-center bg-slate-900/60 p-3 rounded-xl border border-slate-700">
+                <input type="text" id="customName" placeholder="অন্যান্য ডিভাইস (যেমন: ওভেন)" class="w-full sm:flex-1 px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
+                <input type="number" id="customWatt" placeholder="ওয়াট (W)" class="w-full sm:w-24 px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
+                <button onclick="addNewCustomItem()" class="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-xl text-xs transition shadow-lg">➕ যোগ করুন</button>
             </div>
         </div>
 
         <!-- Selected Items in Current Room -->
         <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-2xl shadow-xl backdrop-blur-md space-y-4">
-            <h2 id="activeRoomTitle" class="font-bold text-base text-emerald-400 border-b border-slate-700 pb-2">🛠 রুম ১ এর লিস্ট (যেগুলো সিলেক্ট করেছেন)</h2>
+            <h2 id="activeRoomTitle" class="font-bold text-base text-emerald-400 border-b border-slate-700 pb-2">🛠️ রুম ১ এর নির্বাচিত লোড তালিকা</h2>
             <div id="roomActiveItems" class="space-y-3">
                 <p class="text-xs text-slate-400 italic">উপরের গ্রিড থেকে ডিভাইসে ক্লিক করে এখানে যুক্ত করুন।</p>
             </div>
@@ -123,14 +130,14 @@
 
     <!-- JavaScript Logic -->
     <script>
-        const availableItems = [
-            { name: "লাইট (Light)", watt: 15 },
-            { name: "ফ্যান (Fan)", watt: 75 },
-            { name: "টিভি (TV)", watt: 120 },
-            { name: "ফ্রিজ (Refrigerator)", watt: 300 },
-            { name: "এসি (Air Conditioner)", watt: 1500 },
-            { name: "রাইস কুকার (Rice Cooker)", watt: 1000 },
-            { name: "আয়রন (Iron)", watt: 1000 },
+        let availableItems = [
+            { name: "লাইট", watt: 15 },
+            { name: "ফ্যান", watt: 75 },
+            { name: "টিভি", watt: 120 },
+            { name: "ফ্রিজ", watt: 300 },
+            { name: "এসি", watt: 1500 },
+            { name: "রাইস কুকার", watt: 1000 },
+            { name: "আয়রন", watt: 1000 },
             { name: "ওয়াশিং মেশিন", watt: 500 }
         ];
 
@@ -147,12 +154,28 @@
             grid.innerHTML = '';
             availableItems.forEach(item => {
                 grid.innerHTML += `
-                    <button onclick="addItemToRoom('${item.name}', ${item.watt})" class="p-3 bg-slate-900 hover:bg-blue-600/30 border border-slate-700 hover:border-blue-500 rounded-xl text-center transition flex flex-col items-center justify-center gap-1 shadow-md">
-                        <span class="text-xs font-semibold text-slate-200">${item.name}</span>
-                        <span class="text-[10px] text-emerald-400 font-medium">+ যোগ করুন</span>
+                    <button onclick="addItemToRoom('${item.name}', ${item.watt})" class="p-2.5 bg-slate-900 hover:bg-blue-600/30 border border-slate-700 hover:border-blue-500 rounded-xl text-center transition flex flex-col items-center justify-center gap-1 shadow-md">
+                        <span class="text-xs font-semibold text-slate-200 truncate w-full">${item.name}</span>
+                        <span class="text-[9px] text-emerald-400 font-medium">+ যোগ</span>
                     </button>
                 `;
             });
+        }
+
+        function addNewCustomItem() {
+            const name = document.getElementById('customName').value.trim();
+            const watt = parseFloat(document.getElementById('customWatt').value);
+
+            if (!name || isNaN(watt) || watt <= 0) {
+                alert("দয়া করে সঠিক নাম এবং ওয়াট লিখুন!");
+                return;
+            }
+
+            availableItems.push({ name: name, watt: watt });
+            document.getElementById('customName').value = '';
+            document.getElementById('customWatt').value = '';
+            renderGrid();
+            alert(`"${name}" সফলভাবে যুক্ত হয়েছে!`);
         }
 
         function updateRoomCount() {
@@ -206,7 +229,7 @@
             rObj.items.forEach((item, idx) => {
                 container.innerHTML += `
                     <div class="flex items-center justify-between bg-slate-900 p-3 rounded-xl border border-slate-700 text-xs gap-2">
-                        <span class="font-bold text-slate-200 w-24">${item.name}</span>
+                        <span class="font-bold text-slate-200 w-24 truncate">${item.name}</span>
                         <div class="flex items-center gap-1">
                             <span>ওয়াট:</span>
                             <input type="number" value="${item.watt}" onchange="roomsData[activeRoom].items[idx].watt = parseFloat(this.value)||0" class="w-16 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-white text-center">
@@ -222,7 +245,7 @@
         }
 
         function openResultPage() {
-            let totalWatts = 0;
+            let totalProjectWatts = 0;
             let reportHTML = "";
             let hasItem = false;
 
@@ -237,11 +260,24 @@
                         rWatts += sub;
                         rDetails += `<div class="flex justify-between text-xs py-1 pl-3 border-b border-slate-800"><span class="text-slate-400">${i.name} (${i.qty}টি × ${i.watt}W)</span><span class="text-emerald-400 font-semibold">${sub} W</span></div>`;
                     });
-                    totalWatts += rWatts;
+
+                    let roomAmps = rWatts / 220;
+                    let roomMCB = "10 Amp MCB";
+                    const standardMCBs = [6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100];
+                    for (let mcb of standardMCBs) {
+                        if (roomAmps * 1.25 <= mcb) { roomMCB = mcb + " Amp MCB"; break; }
+                        roomMCB = "100+ Amp MCB";
+                    }
+
+                    totalProjectWatts += rWatts;
                     reportHTML += `
                         <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                            <div class="font-bold text-blue-400 text-sm border-b border-slate-800 pb-1">${r.name} (মোট লোড: ${rWatts} W)</div>
+                            <div class="font-bold text-blue-400 text-sm border-b border-slate-800 pb-1 flex justify-between">
+                                <span>${r.name}</span>
+                                <span class="text-emerald-400">লোডের পরিমাণ: ${rWatts} W (${roomAmps.toFixed(1)}A)</span>
+                            </div>
                             ${rDetails}
+                            <div class="text-[11px] text-purple-300 pt-1">💡 এই রুমের সাব-সার্কিট ব্র্রেকার (MCB): <b>${roomMCB}</b></div>
                         </div>
                     `;
                 }
@@ -252,29 +288,32 @@
                 return;
             }
 
-            let totalAmps = totalWatts / 220;
+            let totalAmps = totalProjectWatts / 220;
             let mainWire = "2.5 RM";
             if (totalAmps > 40) mainWire = "10.0 RM";
             else if (totalAmps > 25) mainWire = "6.0 RM";
             else if (totalAmps > 15) mainWire = "4.0 RM";
 
-            let mcbRating = "10 Amp";
+            let mainMCB = "10 Amp";
             const standardMCBs = [6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100];
             for (let mcb of standardMCBs) {
-                if (totalAmps * 1.25 <= mcb) { mcbRating = mcb + " Amp MCB"; break; }
-                mcbRating = "100+ Amp MCB";
+                if (totalAmps * 1.25 <= mcb) { mainMCB = mcb + " Amp MCB"; break; }
+                mainMCB = "100+ Amp MCB";
             }
 
             const useRccb = document.getElementById('useRccb').checked;
-            let rccbText = useRccb ? "হ্যাঁ (25A/40A, 30mA)" : "প্রযোজ্য নয়";
+            let rccbRating = 25;
+            if (totalAmps > 25 && totalAmps <= 40) rccbRating = 40;
+            else if (totalAmps > 40) rccbRating = 63;
+            let rccbText = useRccb ? `হ্যাঁ (${rccbRating} Amp, 30mA RCCB)` : "প্রযোজ্য নয়";
 
             let summaryBox = `
                 <div class="bg-blue-950/60 p-4 rounded-2xl border border-blue-500/30 space-y-2">
-                    <div class="flex justify-between font-bold text-sm text-white"><span>সর্বমোট লোড:</span><span class="text-blue-400">${totalWatts.toFixed(1)} W</span></div>
-                    <div class="flex justify-between font-bold text-sm text-white"><span>সর্বমোট অ্যাম্পিয়ার:</span><span class="text-blue-400">${totalAmps.toFixed(2)} A</span></div>
+                    <div class="flex justify-between font-bold text-sm text-white"><span>সর্বমোট লোড:</span><span class="text-blue-400">${totalProjectWatts.toFixed(1)} W</span></div>
+                    <div class="flex justify-between font-bold text-sm text-white"><span>সর্বমোট কারেন্ট:</span><span class="text-blue-400">${totalAmps.toFixed(2)} A</span></div>
                     <div class="border-t border-slate-800 pt-2 space-y-1 text-xs text-slate-300">
                         <div class="flex justify-between"><span>মেইন ইনপুট তার:</span><span class="font-bold text-emerald-400">${mainWire}</span></div>
-                        <div class="flex justify-between"><span>মেইন MCB:</span><span class="font-bold text-purple-400">${mcbRating}</span></div>
+                        <div class="flex justify-between"><span>মেইন MCB (সবার জন্য):</span><span class="font-bold text-purple-400">${mainMCB}</span></div>
                         <div class="flex justify-between"><span>RCCB প্রটেকশন:</span><span class="font-bold text-indigo-400">${rccbText}</span></div>
                     </div>
                 </div>
