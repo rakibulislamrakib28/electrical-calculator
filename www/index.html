@@ -26,7 +26,7 @@
     <!-- Sidebar Menu -->
     <div id="sidebar" class="fixed inset-y-0 left-0 w-80 bg-slate-900 border-r border-slate-800 z-50 transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
         <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-950">
-            <h2 class="font-bold text-blue-400 text-base">🛠️ মালামাল ও কাজের বিবরণ</h2>
+            <h2 class="font-bold text-blue-400 text-base">🛠️️ মালামাল ও কাজের বিবরণ</h2>
             <button onclick="toggleSidebar(false)" class="text-slate-400 hover:text-white p-1">✕</button>
         </div>
         <div class="p-4 overflow-y-auto space-y-4 text-sm text-slate-300 flex-1">
@@ -49,7 +49,7 @@
     <!-- Main Container -->
     <main class="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
         
-        <!-- Room Setup Section (Side by Side in one row) -->
+        <!-- Room Setup Section -->
         <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-2xl shadow-xl backdrop-blur-md space-y-3">
             <h2 class="font-bold text-base text-blue-400 border-b border-slate-700 pb-2">🏠 ঘরের সংখ্যা ও রুম নির্বাচন</h2>
             
@@ -67,11 +67,11 @@
             </div>
         </div>
 
-        <!-- Appliances Grid Section (6 items per row style) -->
+        <!-- Appliances Grid Section -->
         <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-2xl shadow-xl backdrop-blur-md space-y-4">
             <h2 class="font-bold text-base text-blue-400 border-b border-slate-700 pb-2">💡 ডিভাইস সিলেক্ট করুন (ক্লিক করলেই ঘরে যুক্ত হবে)</h2>
             <div id="appliancesGrid" class="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                <!-- Dynamically filled with 6 items per row -->
+                <!-- Dynamically filled -->
             </div>
 
             <!-- Custom Add Item Section -->
@@ -149,7 +149,6 @@
         function initApp() {
             renderGrid();
             updateRoomSelector();
-            // Initialize history state for double back detection
             history.pushState({page: 'home'}, '', window.location.href);
         }
 
@@ -236,11 +235,11 @@
                         <span class="font-bold text-slate-200 w-24 truncate">${item.name}</span>
                         <div class="flex items-center gap-1">
                             <span>ওয়াট:</span>
-                            <input type="number" value="${item.watt}" onchange="roomsData[activeRoom].items[idx].watt = parseFloat(this.value)||0" class="w-16 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-white text-center">
+                            <input type="number" value="${item.watt}" oninput="roomsData[activeRoom].items[idx].watt = parseFloat(this.value)||0" class="w-16 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-white text-center">
                         </div>
                         <div class="flex items-center gap-1">
                             <span>সংখ্যা:</span>
-                            <input type="number" min="1" value="${item.qty}" onchange="roomsData[activeRoom].items[idx].qty = parseInt(this.value)||0" class="w-14 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-white text-center">
+                            <input type="number" min="1" value="${item.qty}" oninput="roomsData[activeRoom].items[idx].qty = parseInt(this.value)||0" class="w-14 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-white text-center">
                         </div>
                         <button onclick="roomsData[activeRoom].items.splice(${idx},1); renderActiveRoomItems();" class="text-red-400 bg-red-950/40 px-2 py-1 rounded">ডিলিট</button>
                     </div>
@@ -331,11 +330,10 @@
             document.getElementById('resultModal').classList.add('hidden');
         }
 
-        // Perfect Double Back Press Handling with Yes/No Popup
+        // Double Back Press handling with Yes/No popup
         window.addEventListener('popstate', function (e) {
             const currentTime = new Date().getTime();
             
-            // If result modal is open, close it first instead of triggering exit popup
             if (!document.getElementById('resultModal').classList.contains('hidden')) {
                 closeResultPage();
                 history.pushState({page: 'home'}, '', window.location.href);
@@ -343,10 +341,8 @@
             }
 
             if (backPressTimer && (currentTime - backPressTimer < 2500)) {
-                // Second click within 2.5 seconds -> Show Exit Popup
                 document.getElementById('exitModal').classList.remove('hidden');
             } else {
-                // First click -> set timer and push state back
                 backPressTimer = currentTime;
                 history.pushState({page: 'home'}, '', window.location.href);
             }
@@ -359,7 +355,6 @@
         }
 
         function exitApp() {
-            // Tries to close window or fallback to blank page for mobile wrappers
             window.close();
             window.location.href = "about:blank";
         }
