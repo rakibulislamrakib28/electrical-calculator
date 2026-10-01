@@ -165,13 +165,13 @@
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
-          apiKey: "AIzaSyAi_L2wIpbxTpM7MAir42vVjbwquqxTgL4",
-          authDomain: "electrical-calculator-a44be.firebaseapp.com",
-          projectId: "electrical-calculator-a44be",
-          storageBucket: "electrical-calculator-a44be.appspot.com",
-          messagingSenderId: "974216886708",
-          appId: "1:974216886708:web:7db5667c7019bcbxaad5ef",
-          measurementId: "G-LZVWN9W6PL"
+          apiKey: "AIzaSyAi_Lz0IpbsTpM7MaLr42vVjbwquqXtgL0",
+          authDomain: "electrical-calculator-a84be.firebaseapp.com",
+          projectId: "electrical-calculator-a84be",
+          storageBucket: "electrical-calculator-a84be.firebasestorage.app",
+          messagingSenderId: "974316886708",
+          appId: "1:974316886708:web:7db5667c7818bc8a6ad5e1",
+          measurementId: "G-LZV8NGN6PL"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -263,11 +263,9 @@
                 return;
             }
 
-            // Convert phone to pseudo email for Firebase Authentication
             let pseudoEmail = `${phone}@calculatorapp.com`;
 
             if(isRegisterMode) {
-                // Register new user
                 window.createUserWithEmailAndPassword(window.auth, pseudoEmail, password)
                 .then((userCredential) => {
                     alert("সফলভাবে অ্যাকাউন্ট তৈরি হয়েছে!");
@@ -278,7 +276,6 @@
                     alert("রেজিস্ট্রেশন করতে সমস্যা হয়েছে: " + error.message);
                 });
             } else {
-                // Login existing user
                 window.signInWithEmailAndPassword(window.auth, pseudoEmail, password)
                 .then((userCredential) => {
                     alert("লগইন সফল হয়েছে!");
@@ -490,7 +487,6 @@
             document.getElementById('fullReportContent').innerHTML = summaryBox + reportHTML;
             document.getElementById('resultModal').classList.remove('hidden');
 
-            // Save data to Firestore automatically
             saveResultToFirestore(totalProjectWatts, totalAmps);
         }
 
