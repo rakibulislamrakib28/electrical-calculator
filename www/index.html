@@ -13,6 +13,31 @@
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-blue-950 text-slate-100 min-h-screen pb-12">
 
+    <!-- Phone Login Modal Overlay (Initially Hidden if already logged in) -->
+    <div id="authModal" class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center p-4">
+        <div class="max-w-md w-full bg-slate-900 border border-slate-700 p-6 rounded-3xl shadow-2xl space-y-5">
+            <h2 class="text-xl font-bold text-blue-400 text-center">📱 মোবাইল নম্বর দিয়ে লগইন করুন</h2>
+            <p class="text-xs text-slate-400 text-center">অ্যাপে প্রবেশ করতে এবং আপনার হিসাব ফায়ারবেসে সেভ করতে আপনার মোবাইল নম্বর দিন।</p>
+            
+            <div id="step-phone" class="space-y-4">
+                <div>
+                    <label class="block text-xs text-slate-300 mb-1">মোবাইল নম্বর:</label>
+                    <input type="tel" id="phoneNumber" placeholder="+8801XXXXXXXXX" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-600 rounded-xl text-sm text-white">
+                </div>
+                <div id="recaptcha-container"></div>
+                <button onclick="sendOTP()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition text-sm">কোড পাঠান (Send OTP)</button>
+            </div>
+
+            <div id="step-otp" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-xs text-slate-300 mb-1">ভেরিফিকেশন কোড (OTP):</label>
+                    <input type="text" id="otpCode" placeholder="৬ ডিজিটের কোড দিন" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-600 rounded-xl text-sm text-white text-center tracking-widest font-bold">
+                </div>
+                <button onclick="verifyOTP()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition text-sm">লগইন নিশ্চিত করুন</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Top Navigation Bar -->
     <header class="bg-slate-900/80 border-b border-slate-800 sticky top-0 z-40 px-4 py-3 flex justify-between items-center shadow-lg backdrop-blur-md">
         <div class="flex items-center gap-3">
@@ -21,22 +46,23 @@
             </button>
             <h1 class="text-base sm:text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">⚡ স্মার্ট ইলেকট্রিক ক্যালকুলেটর</h1>
         </div>
+        <div id="userPhoneDisplay" class="text-xs text-emerald-400 font-medium bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700"></div>
     </header>
 
     <!-- Sidebar Menu -->
     <div id="sidebar" class="fixed inset-y-0 left-0 w-80 bg-slate-900 border-r border-slate-800 z-50 transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
         <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-950">
-            <h2 class="font-bold text-blue-400 text-base">🛠️️ মালামাল ও কাজের বিবরণ</h2>
+            <h2 class="font-bold text-blue-400 text-base">🛠 মালামাল ও কাজের বিবরণ</h2>
             <button onclick="toggleSidebar(false)" class="text-slate-400 hover:text-white p-1">✕</button>
         </div>
         <div class="p-4 overflow-y-auto space-y-4 text-sm text-slate-300 flex-1">
             <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700">
                 <h3 class="font-bold text-blue-300 mb-1">১. MCB (Circuit Breaker)</h3>
-                <p class="text-xs text-slate-400">লোডের অ্যাম্পিয়ার অনুযায়ী ছোট-বড় (যেমন: 10A, 16A, 32A, 63A) ব্যবহার করতে হয়।</p>
+                <p class="text-xs text-slate-400">লোডের অ্যাম্পিয়ার অনুযায়ী ছোট-বড় (যেমন: 10A, 16A, 32A, 63A) ব্যবহার করতে হয়।</p>
             </div>
             <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700">
                 <h3 class="font-bold text-blue-300 mb-1">২. RCCB</h3>
-                <p class="text-xs text-slate-400">মোট লোডের ওপর ভিত্তি করে 25A, 40A বা 63A (30mA) ক্ষমতার RCCB দিতে হয়।</p>
+                <p class="text-xs text-slate-400">মোট লোডের ওপর ভিত্তি করে 25A, 40A বা 63A (30mA) ক্ষমতার RCCB দিতে হয়।</p>
             </div>
             <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700">
                 <h3 class="font-bold text-blue-300 mb-1">৩. তার বা ক্যাবল (RM)</h3>
@@ -77,7 +103,7 @@
             <!-- Custom Add Item Section -->
             <div class="pt-3 border-t border-slate-700 flex flex-col sm:flex-row gap-2 items-center bg-slate-900/60 p-3 rounded-xl border border-slate-700">
                 <input type="text" id="customName" placeholder="অন্যান্য ডিভাইস (যেমন: ওভেন)" class="w-full sm:flex-1 px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
-                <input type="number" id="customWatt" placeholder="ওয়াট (W)" class="w-full sm:w-24 px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
+                <input type="number" id="customWatt" placeholder="ওয়াট (W)" class="w-full sm:w-24 px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
                 <button onclick="addNewCustomItem()" class="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-xl text-xs transition shadow-lg">➕ যোগ করুন</button>
             </div>
         </div>
@@ -129,7 +155,36 @@
         </div>
     </div>
 
-    <!-- JavaScript Logic -->
+    <!-- Firebase SDKs (Modular v10) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // আপনার ফায়ারবেস কনফিগারেশন এখানে যুক্ত করুন (ফায়ারবেস প্রজেক্ট সেটিংস থেকে পেয়ে যাবেন)
+        const firebaseConfig = {
+          apiKey: "YOUR_API_KEY",
+          authDomain: "YOUR_AUTH_DOMAIN",
+          projectId: "YOUR_PROJECT_ID",
+          storageBucket: "YOUR_STORAGE_BUCKET",
+          messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+          appId: "YOUR_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.auth = auth;
+        window.RecaptchaVerifier = RecaptchaVerifier;
+        window.signInWithPhoneNumber = signInWithPhoneNumber;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.serverTimestamp = serverTimestamp;
+    </script>
+
+    <!-- JavaScript Logic & Firebase Authentication -->
     <script>
         let availableItems = [
             { name: "লাইট", watt: 15 },
@@ -138,18 +193,64 @@
             { name: "ফ্রিজ", watt: 300 },
             { name: "এসি", watt: 1500 },
             { name: "রাইস কুকার", watt: 1000 },
-            { name: "আয়রন", watt: 1000 },
-            { name: "ওয়াশিং মেশিন", watt: 500 }
+            { name: "আয়রন", watt: 1000 },
+            { name: "ওয়াশিং মেশিন", watt: 500 }
         ];
 
         let roomsData = { 0: { name: "রুম ১", items: [] } };
         let activeRoom = 0;
         let backPressTimer = 0;
+        let confirmationResultObj = null;
 
         function initApp() {
             renderGrid();
             updateRoomSelector();
             history.pushState({page: 'home'}, '', window.location.href);
+        }
+
+        // Phone Authentication Functions
+        function sendOTP() {
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            if (!phoneNumber) {
+                alert("দয়া করে সঠিক মোবাইল নম্বর দিন!");
+                return;
+            }
+
+            if (!window.recaptchaVerifier) {
+                window.recaptchaVerifier = new window.RecaptchaVerifier(window.auth, 'recaptcha-container', {
+                    'size': 'invisible'
+                });
+            }
+
+            const appVerifier = window.recaptchaVerifier;
+            window.signInWithPhoneNumber(window.auth, phoneNumber, appVerifier)
+                .then((confirmationResult) => {
+                    confirmationResultObj = confirmationResult;
+                    document.getElementById('step-phone').classList.add('hidden');
+                    document.getElementById('step-otp').classList.remove('hidden');
+                    alert("আপনার নম্বরে একটি ওটিপি (OTP) কোড পাঠানো হয়েছে!");
+                }).catch((error) => {
+                    console.error("SMS পাঠাতে সমস্যা হয়েছে:", error);
+                    alert("এসএমএস পাঠানো যায়নি। আবার চেষ্টা করুন।");
+                });
+        }
+
+        function verifyOTP() {
+            const code = document.getElementById('otpCode').value.trim();
+            if (!code) {
+                alert("দয়া করে ওটিপি কোডটি লিখুন!");
+                return;
+            }
+
+            confirmationResultObj.confirm(code).then((result) => {
+                const user = result.user;
+                document.getElementById('authModal').classList.add('hidden');
+                document.getElementById('userPhoneDisplay').innerText = `👤 ${user.phoneNumber || 'লগইন সফল'}`;
+                alert("লগইন সফল হয়েছে!");
+            }).catch((error) => {
+                console.error("কোড ভুল:", error);
+                alert("ভুল ওটিপি কোড! আবার চেষ্টা করুন।");
+            });
         }
 
         function renderGrid() {
@@ -170,7 +271,7 @@
             const watt = parseFloat(document.getElementById('customWatt').value);
 
             if (!name || isNaN(watt) || watt <= 0) {
-                alert("দয়া করে সঠিক নাম এবং ওয়াট লিখুন!");
+                alert("দয়া করে সঠিক নাম এবং ওয়াট লিখুন!");
                 return;
             }
 
@@ -178,7 +279,7 @@
             document.getElementById('customName').value = '';
             document.getElementById('customWatt').value = '';
             renderGrid();
-            alert(`"${name}" সফলভাবে যুক্ত হয়েছে!`);
+            alert(`"${name}" সফলভাবে যুক্ত হয়েছে!`);
         }
 
         function updateRoomCount() {
@@ -224,7 +325,7 @@
             const container = document.getElementById('roomActiveItems');
             
             if (rObj.items.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400 italic">এই রুমে এখনো কোনো ডিভাইস যোগ করা হয়নি।</p>`;
+                container.innerHTML = `<p class="text-xs text-slate-400 italic">এই রুমে এখনো কোনো ডিভাইস যোগ করা হয়নি।</p>`;
                 return;
             }
 
@@ -234,7 +335,7 @@
                     <div class="flex items-center justify-between bg-slate-900 p-3 rounded-xl border border-slate-700 text-xs gap-2">
                         <span class="font-bold text-slate-200 w-24 truncate">${item.name}</span>
                         <div class="flex items-center gap-1">
-                            <span>ওয়াট:</span>
+                            <span>ওয়াট:</span>
                             <input type="number" value="${item.watt}" oninput="roomsData[activeRoom].items[idx].watt = parseFloat(this.value)||0" class="w-16 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-white text-center">
                         </div>
                         <div class="flex items-center gap-1">
@@ -245,6 +346,22 @@
                     </div>
                 `;
             });
+        }
+
+        // Save calculation to Firestore Database automatically when opening result
+        async function saveResultToFirestore(totalWatts, totalAmps) {
+            try {
+                await window.addDoc(window.collection(window.db, "electrical_calculations"), {
+                    user: window.auth.currentUser ? window.auth.currentUser.phoneNumber : "Guest",
+                    totalWatts: totalWatts,
+                    totalAmps: totalAmps,
+                    roomsData: roomsData,
+                    timestamp: window.serverTimestamp()
+                });
+                console.log("ডেটা ফায়ারবেসে সফলভাবে সেভ হয়েছে!");
+            } catch (e) {
+                console.error("ডেটা সেভ করতে সমস্যা হয়েছে: ", e);
+            }
         }
 
         function openResultPage() {
@@ -287,7 +404,7 @@
             }
 
             if (!hasItem) {
-                alert("দয়া করে যেকোনো রুমে অন্তত একটি ডিভাইস যোগ করুন!");
+                alert("দয়া করে যেকোনো রুমে অন্তত একটি ডিভাইস যোগ করুন!");
                 return;
             }
 
@@ -308,12 +425,12 @@
             let rccbRating = 25;
             if (totalAmps > 25 && totalAmps <= 40) rccbRating = 40;
             else if (totalAmps > 40) rccbRating = 63;
-            let rccbText = useRccb ? `হ্যাঁ (${rccbRating} Amp, 30mA RCCB)` : "প্রযোজ্য নয়";
+            let rccbText = useRccb ? `হ্যাঁ (${rccbRating} Amp, 30mA RCCB)` : "প্রযোজ্য নয়";
 
             let summaryBox = `
                 <div class="bg-blue-950/60 p-4 rounded-2xl border border-blue-500/30 space-y-2">
                     <div class="flex justify-between font-bold text-sm text-white"><span>সর্বমোট লোড:</span><span class="text-blue-400">${totalProjectWatts.toFixed(1)} W</span></div>
-                    <div class="flex justify-between font-bold text-sm text-white"><span>সর্বমোট অ্যাম্পিয়ার:</span><span class="text-blue-400">${totalAmps.toFixed(2)} A</span></div>
+                    <div class="flex justify-between font-bold text-sm text-white"><span>সর্বমোট অ্যাম্পিয়ার:</span><span class="text-blue-400">${totalAmps.toFixed(2)} A</span></div>
                     <div class="border-t border-slate-800 pt-2 space-y-1 text-xs text-slate-300">
                         <div class="flex justify-between"><span>মেইন ইনপুট তার:</span><span class="font-bold text-emerald-400">${mainWire}</span></div>
                         <div class="flex justify-between"><span>মেইন MCB (সবার জন্য):</span><span class="font-bold text-purple-400">${mainMCB}</span></div>
@@ -324,13 +441,15 @@
 
             document.getElementById('fullReportContent').innerHTML = summaryBox + reportHTML;
             document.getElementById('resultModal').classList.remove('hidden');
+
+            // Save data to Firestore automatically
+            saveResultToFirestore(totalProjectWatts, totalAmps);
         }
 
         function closeResultPage() {
             document.getElementById('resultModal').classList.add('hidden');
         }
 
-        // Double Back Press handling with Yes/No popup
         window.addEventListener('popstate', function (e) {
             const currentTime = new Date().getTime();
             
