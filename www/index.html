@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Electrical Wiring & Load Calculator</title>
+    <title>Smart Electrical Admin Panel</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
@@ -23,7 +23,7 @@
     <div id="splashScreen" class="fixed inset-0 bg-slate-950 z-50 flex flex-col items-center justify-center p-4 transition-opacity duration-700">
         <div class="bg-slate-900 border border-blue-500/30 p-8 rounded-3xl shadow-2xl text-center space-y-4 max-w-sm w-full backdrop-blur-md">
             <div class="w-16 h-16 bg-blue-600/20 border border-blue-500 rounded-2xl mx-auto flex items-center justify-center text-3xl animate-bounce">⚡</div>
-            <h1 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">স্মার্ট ইলেকট্রিক ক্যালকুলেটর</h1>
+            <h1 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">স্মার্ট ইলেকট্রিক এডমিন প্যানেল</h1>
             <div class="pt-2 border-t border-slate-800 space-y-1">
                 <p class="text-xs text-slate-300 font-medium">ডেভেলপার ও পরিচালনায়:</p>
                 <p class="text-sm font-bold text-emerald-400">Rakibul Islam Rakib</p>
@@ -33,7 +33,7 @@
                 <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
                     <div id="splashBar" class="bg-gradient-to-r from-blue-500 to-emerald-500 h-full w-0 transition-all duration-1000"></div>
                 </div>
-                <p class="text-[10px] text-slate-500 mt-2 animate-pulse">অ্যাপ লোড হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন...</p>
+                <p class="text-[10px] text-slate-500 mt-2 animate-pulse">এডমিন প্যানেল লোড হচ্ছে...</p>
             </div>
         </div>
     </div>
@@ -41,8 +41,8 @@
     <!-- Login / Registration Modal Overlay -->
     <div id="authModal" class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center p-4 hidden">
         <div class="max-w-md w-full bg-slate-900 border border-slate-700 p-6 rounded-3xl shadow-2xl space-y-5">
-            <h2 id="authTitle" class="text-xl font-bold text-blue-400 text-center">📱 মোবাইল নম্বর দিয়ে লগইন</h2>
-            <p id="authSub" class="text-xs text-slate-400 text-center">আপনার মোবাইল নম্বর এবং শুধু সংখ্যা দিয়ে পিন/পাসওয়ার্ড দিন।</p>
+            <h2 id="authTitle" class="text-xl font-bold text-blue-400 text-center">🔐 এডমিন লগইন</h2>
+            <p id="authSub" class="text-xs text-slate-400 text-center">আপনার এডমিন মোবাইল নম্বর এবং পিন দিন।</p>
             
             <div class="space-y-4">
                 <div>
@@ -55,10 +55,6 @@
                 </div>
                 
                 <button id="authBtn" onclick="handleLogin()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition text-sm shadow-lg">লগইন করুন</button>
-                
-                <div class="text-center pt-2">
-                    <button onclick="toggleAuthMode()" id="switchAuthModeBtn" class="text-xs text-emerald-400 hover:underline">একাউন্ট নেই? নতুন রেজিস্টার করুন</button>
-                </div>
             </div>
         </div>
     </div>
@@ -69,11 +65,11 @@
             <button onclick="toggleSidebar(true)" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl transition text-blue-400">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
-            <h1 class="text-xs sm:text-base font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">⚡ স্মার্ট ইলেকট্রিক ক্যালকুলেটর</h1>
+            <h1 class="text-xs sm:text-base font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">⚡ ইলেকট্রিক এডমিন প্যানেল</h1>
         </div>
         <div class="flex items-center gap-1.5 sm:gap-2">
             <button onclick="openWattCalcModal()" class="text-[11px] bg-emerald-900/60 border border-emerald-600 text-emerald-300 px-2 py-1.5 rounded-lg">💡 ওয়াট ক্যালক</button>
-            <button onclick="openHistoryModal()" class="text-[11px] bg-blue-900/60 border border-blue-600 text-blue-300 px-2 py-1.5 rounded-lg">📁 হিস্ট্রি</button>
+            <button onclick="openHistoryModal()" class="text-[11px] bg-blue-900/60 border border-blue-600 text-blue-300 px-2 py-1.5 rounded-lg">📁 সেভ প্রজেক্ট</button>
             <button onclick="confirmLogout()" class="text-[11px] text-red-400 bg-red-950/40 px-2 py-1.5 rounded-lg border border-red-900/50">লগআউট</button>
         </div>
     </header>
@@ -81,7 +77,7 @@
     <!-- Sidebar Menu -->
     <div id="sidebar" class="fixed inset-y-0 left-0 w-80 bg-slate-900 border-r border-slate-800 z-50 transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
         <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-950">
-            <h2 class="font-bold text-blue-400 text-base">🛠 কাজের গাইড ও স্ট্যান্ডার্ড</h2>
+            <h2 class="font-bold text-blue-400 text-base">🛠 এডমিন গাইড ও কন্ট্রোল</h2>
             <button onclick="toggleSidebar(false)" class="text-slate-400 hover:text-white p-1">✕</button>
         </div>
         <div class="p-4 overflow-y-auto space-y-3 text-xs text-slate-300 flex-1">
@@ -91,7 +87,7 @@
             </div>
             <div class="p-3 bg-slate-900 rounded-xl border border-slate-700 text-center">
                 <p class="text-[11px] text-emerald-400 font-bold">Rakibul islam Rakib Dinajpur</p>
-                <p class="text-[10px] text-slate-400">ফেসবুক পেজ: অফিসিয়াল পেজ</p>
+                <p class="text-[10px] text-slate-400">প্রধান এডমিন প্যানেল</p>
             </div>
         </div>
     </div>
@@ -100,7 +96,22 @@
     <!-- Main Container -->
     <main class="max-w-4xl mx-auto p-3 sm:p-6 space-y-4">
         
-        <!-- Room Setup Section (Compact & Clean) -->
+        <!-- User Management / Client Assign Section -->
+        <div class="bg-slate-800/80 border border-slate-700 p-4 rounded-2xl shadow-xl backdrop-blur-md space-y-3">
+            <h2 class="font-bold text-xs sm:text-sm text-amber-400 border-b border-slate-700 pb-1.5">👤 নতুন ইউজার বা ক্লায়েন্ট তৈরি করুন</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[11px] text-slate-300 mb-1">ক্লায়েন্টের নাম / প্রজেক্ট:</label>
+                    <input type="text" id="clientNameInput" placeholder="যেমন: রহিম সাহেবের বাড়ি" class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-xl text-xs text-white">
+                </div>
+                <div>
+                    <label class="block text-[11px] text-slate-300 mb-1">ক্লায়েন্টের মোবাইল নম্বর:</label>
+                    <input type="tel" id="clientPhoneInput" placeholder="017xxxxxxxx" class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-xl text-xs text-white">
+                </div>
+            </div>
+        </div>
+
+        <!-- Room Setup Section -->
         <div class="bg-slate-800/80 border border-slate-700 p-4 rounded-2xl shadow-xl backdrop-blur-md space-y-2">
             <h2 class="font-bold text-xs sm:text-sm text-blue-400 border-b border-slate-700 pb-1.5">🏠 ঘরের সংখ্যা ও রুম নির্বাচন</h2>
             <div class="grid grid-cols-2 gap-2">
@@ -158,11 +169,11 @@
             </div>
         </div>
 
-        <!-- Selected Items in Current Room (Split views inside room) -->
+        <!-- Selected Items in Current Room -->
         <div class="bg-slate-800/80 border border-slate-700 p-4 sm:p-5 rounded-2xl shadow-xl backdrop-blur-md space-y-4">
             <h2 id="activeRoomTitle" class="font-bold text-sm text-emerald-400 border-b border-slate-700 pb-2">🛠️ রুম ১ এর তালিকা</h2>
             <div id="roomActiveItems" class="space-y-3">
-                <p class="text-xs text-slate-400 italic">এই রুমে এখনো কোনো আইটেম যোগ করা হয়নি।</p>
+                <p class="text-xs text-slate-400 italic">এই রুমে এখনো কোনো আইটেম যোগ করা হয়নি।</p>
             </div>
         </div>
 
@@ -176,7 +187,7 @@
         </div>
 
         <button onclick="openResultPage()" class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white font-bold rounded-2xl shadow-xl shadow-blue-900/50 transition text-sm">
-            📊 হিসাব ও বিস্তারিত রেজাল্ট পেজে যান
+            📊 হিসাব ও বিস্তারিত রেজাল্ট পেজে যান এবং সেভ করুন
         </button>
     </main>
 
@@ -184,7 +195,7 @@
     <div id="resultModal" class="fixed inset-0 bg-slate-950 z-50 overflow-y-auto p-3 sm:p-8 hidden">
         <div class="max-w-2xl mx-auto bg-slate-900 border border-slate-700 p-5 sm:p-6 rounded-3xl shadow-2xl space-y-5">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3 no-print">
-                <h2 class="text-base sm:text-xl font-bold text-amber-400">📓 কমপ্লিট নোটবুক রিপোর্ট ও শপিং লিস্ট</h2>
+                <h2 class="text-base sm:text-xl font-bold text-amber-400">📓 ক্লায়েন্ট রিপোর্ট ও শপিং লিস্ট</h2>
                 <div class="flex gap-2">
                     <button onclick="window.print()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-1">📥 PDF সেভ / প্রিন্ট</button>
                     <button onclick="closeResultPage()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs">✕ বন্ধ</button>
@@ -216,15 +227,15 @@
         </div>
     </div>
 
-    <!-- History Modal -->
+    <!-- History / Saved Projects Modal -->
     <div id="historyModal" class="fixed inset-0 bg-slate-950 z-50 overflow-y-auto p-4 hidden">
         <div class="max-w-xl mx-auto bg-slate-900 border border-slate-700 p-6 rounded-3xl shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h2 class="text-lg font-bold text-blue-400">📁 সেভ করা আগের হিসাবসমূহ</h2>
+                <h2 class="text-lg font-bold text-blue-400">📁 সেভ করা ইউজার প্রজেক্টসমূহ</h2>
                 <button onclick="closeHistoryModal()" class="text-slate-400 hover:text-white px-2.5 py-1 bg-slate-800 rounded-lg text-xs">✕ বন্ধ করুন</button>
             </div>
             <div id="historyContent" class="space-y-3 max-h-96 overflow-y-auto text-xs text-slate-300">
-                <p class="text-slate-400 italic">হিস্ট্রি লোড হচ্ছে...</p>
+                <p class="text-slate-400 italic">প্রজেক্ট লোড হচ্ছে...</p>
             </div>
         </div>
     </div>
@@ -233,7 +244,7 @@
     <div id="logoutModal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-900 border border-slate-700 p-6 rounded-2xl max-w-sm w-full text-center space-y-4 shadow-2xl">
             <h3 class="text-lg font-bold text-white">🚪 লগআউট নিশ্চিতকরণ</h3>
-            <p class="text-sm text-slate-400">আপনি কি সত্যিই একাউন্ট থেকে বের হতে চান?</p>
+            <p class="text-sm text-slate-400">আপনি কি সত্যিই এডমিন প্যানেল থেকে বের হতে চান?</p>
             <div class="flex gap-3 pt-2">
                 <button onclick="closeLogoutModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-xl transition">No (না)</button>
                 <button onclick="logoutUser()" class="flex-1 py-2.5 bg-red-600 hover:bg-red-500 text-white font-medium rounded-xl transition">Yes (হ্যাঁ)</button>
@@ -291,7 +302,6 @@
 
     <!-- JavaScript Logic -->
     <script>
-        // Strictly separated: Load items (watt consuming) vs Material items (quantities only)
         let availableLoads = [
             { name: "লাইট", watt: 15 },
             { name: "ফ্যান", watt: 75 },
@@ -317,8 +327,7 @@
 
         let roomsData = { 0: { name: "রুম ১", loads: [], materials: [] } };
         let activeRoom = 0;
-        let currentTab = 'load'; // 'load' or 'material'
-        let isRegisterMode = false;
+        let currentTab = 'load';
 
         window.onload = function() {
             setTimeout(() => {
@@ -342,9 +351,7 @@
                 if(window.auth) {
                     window.onAuthStateChanged(window.auth, (user) => {
                         if (user) {
-                            let cleanPhone = user.email.split('@')[0];
                             document.getElementById('authModal').classList.add('hidden');
-                            document.getElementById('userPhoneDisplay').innerText = `👤 ${cleanPhone}`;
                         } else {
                             document.getElementById('authModal').classList.remove('hidden');
                         }
@@ -373,7 +380,7 @@
             }
         }
 
-        window.addEventListener('popstate', function (e) {
+        window.addEventListener('popstate', function () {
             const resultModal = document.getElementById('resultModal');
             const historyModal = document.getElementById('historyModal');
             const wattCalcModal = document.getElementById('wattCalcModal');
@@ -399,52 +406,29 @@
             else { window.location.href = "about:blank"; }
         }
 
-        function toggleAuthMode() {
-            isRegisterMode = !isRegisterMode;
-            const title = document.getElementById('authTitle');
-            const sub = document.getElementById('authSub');
-            const btn = document.getElementById('authBtn');
-            const switchBtn = document.getElementById('switchAuthModeBtn');
-
-            if(isRegisterMode) {
-                title.innerText = "📝 নতুন অ্যাকাউন্ট তৈরি করুন";
-                sub.innerText = "আপনার মোবাইল নম্বর এবং শুধু সংখ্যা দিয়ে একটি পিন/পাসওয়ার্ড দিন।";
-                btn.innerText = "রেজিস্ট্রার করুন";
-                switchBtn.innerText = "আগে থেকেই অ্যাকাউন্ট আছে? লগইন করুন";
-            } else {
-                title.innerText = "📱 মোবাইল নম্বর দিয়ে লগইন";
-                sub.innerText = "আপনার মোবাইল নম্বর এবং শুধু সংখ্যা দিয়ে পিন/পাসওয়ার্ড দিন।";
-                btn.innerText = "লগইন করুন";
-                switchBtn.innerText = "একাউন্ট নেই? নতুন রেজিস্টার করুন";
-            }
-        }
-
         function handleLogin() {
             let phone = document.getElementById('loginPhone').value.trim();
             let password = document.getElementById('loginPassword').value.trim();
 
             if(!phone || phone.length < 10) { alert("দয়া করে সঠিক মোবাইল নম্বর দিন!"); return; }
-            if(!password || isNaN(password)) { alert("পাসওয়ার্ডে শুধুমাত্র সংখ্যা (Numbers) ব্যবহার করুন!"); return; }
+            if(!password || isNaN(password)) { alert("পাসওয়ার্ডে শুধুমাত্র সংখ্যা দিন!"); return; }
 
-            let pseudoEmail = `${phone}@calculatorapp.com`;
+            let pseudoEmail = `${phone}@adminpanel.com`;
 
-            if(isRegisterMode) {
+            window.signInWithEmailAndPassword(window.auth, pseudoEmail, password)
+            .then(() => {
+                alert("এডমিন লগইন সফল হয়েছে!");
+                document.getElementById('authModal').classList.add('hidden');
+            })
+            .catch(() => {
+                // If admin doesn't exist, auto create for convenience
                 window.createUserWithEmailAndPassword(window.auth, pseudoEmail, password)
                 .then(() => {
-                    alert("সফলভাবে অ্যাকাউন্ট তৈরি হয়েছে!");
+                    alert("নতুন এডমিন একাউন্ট তৈরি ও লগইন সফল!");
                     document.getElementById('authModal').classList.add('hidden');
-                    document.getElementById('userPhoneDisplay').innerText = `👤 ${phone}`;
                 })
-                .catch((error) => { alert("রেজিস্ট্রেশন করতে সমস্যা হয়েছে: " + error.message); });
-            } else {
-                window.signInWithEmailAndPassword(window.auth, pseudoEmail, password)
-                .then(() => {
-                    alert("লগইন সফল হয়েছে!");
-                    document.getElementById('authModal').classList.add('hidden');
-                    document.getElementById('userPhoneDisplay').innerText = `👤 ${phone}`;
-                })
-                .catch((error) => { alert("লগইন ব্যর্থ হয়েছে! নম্বর বা পাসওয়ার্ড ভুল আছে।"); });
-            }
+                .catch((error) => { alert("লগইন ব্যর্থ: " + error.message); });
+            });
         }
 
         function confirmLogout() { document.getElementById('logoutModal').classList.remove('hidden'); }
@@ -452,7 +436,7 @@
         function logoutUser() {
             closeLogoutModal();
             window.signOut(window.auth).then(() => {
-                alert("লগআউট সফল হয়েছে!");
+                alert("লগআউট সফল!");
                 location.reload();
             });
         }
@@ -463,7 +447,7 @@
         function calculateCustomWatt() {
             let w = parseFloat(document.getElementById('inputWattField').value) || 0;
             let resBox = document.getElementById('wattCalcResult');
-            if(w <= 0) { alert("দয়া করে সঠিক ওয়াট লিখুন!"); return; }
+            if(w <= 0) { alert("সঠিক ওয়াট লিখুন!"); return; }
 
             let amps = w / 220;
             let wire = "2.5 RM তার";
@@ -480,8 +464,8 @@
             resBox.classList.remove('hidden');
             resBox.innerHTML = `
                 <div class="text-emerald-400 font-bold">অ্যাম্পিয়ার: ${amps.toFixed(2)} A</div>
-                <div class="text-blue-300">প্রয়োজনীয় তার: <b>${wire}</b></div>
-                <div class="text-purple-300">প্রয়োজনীয় ব্র্রেকার: <b>${mcb}</b></div>
+                <div class="text-blue-300">তার: <b>${wire}</b></div>
+                <div class="text-purple-300">ব্র্রেকার: <b>${mcb}</b></div>
             `;
         }
 
@@ -534,7 +518,7 @@
             document.getElementById('customLoadWatt').value = '';
             document.getElementById('customSectionLoad').classList.add('hidden');
             renderDropdowns();
-            alert(`"${name}" সফলভাবে যুক্ত হয়েছে!`);
+            alert(`"${name}" যুক্ত হয়েছে!`);
         }
 
         function addNewCustomMat() {
@@ -544,7 +528,7 @@
             document.getElementById('customMatName').value = '';
             document.getElementById('customSectionMat').classList.add('hidden');
             renderDropdowns();
-            alert(`"${name}" সফলভাবে যুক্ত হয়েছে!`);
+            alert(`"${name}" যুক্ত হয়েছে!`);
         }
 
         function updateRoomCount() {
@@ -595,13 +579,12 @@
             let container = document.getElementById('roomActiveItems');
 
             if(rObj.loads.length === 0 && rObj.materials.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400 italic">এই রুমে এখনো কিছু যোগ করা হয়নি।</p>`;
+                container.innerHTML = `<p class="text-xs text-slate-400 italic">এই রুমে কিছু নেই।</p>`;
                 return;
             }
 
             container.innerHTML = '';
             
-            // Render Loads
             if(rObj.loads.length > 0) {
                 container.innerHTML += `<div class="text-xs font-bold text-blue-400 pt-1">⚡ ডিভাইস ও লোড:</div>`;
                 rObj.loads.forEach((item, idx) => {
@@ -615,7 +598,6 @@
                 });
             }
 
-            // Render Materials
             if(rObj.materials.length > 0) {
                 container.innerHTML += `<div class="text-xs font-bold text-emerald-400 pt-2">🛒 মালামাল / এক্সেসরিজ:</div>`;
                 rObj.materials.forEach((item, idx) => {
@@ -631,30 +613,31 @@
 
         async function saveResultToFirestore(totalWatts, totalAmps) {
             try {
-                let currentUser = window.auth.currentUser;
-                if(!currentUser) return;
-                let userPhone = currentUser.email.split('@')[0];
+                let clientName = document.getElementById('clientNameInput').value.trim() || "নামহীন প্রজেক্ট";
+                let clientPhone = document.getElementById('clientPhoneInput').value.trim() || "01700000000";
+                
                 await window.addDoc(window.collection(window.db, "electrical_calculations"), {
-                    userPhone: userPhone, totalWatts: totalWatts, totalAmps: totalAmps,
-                    roomsData: roomsData, timestamp: window.serverTimestamp()
+                    clientName: clientName,
+                    clientPhone: clientPhone,
+                    totalWatts: totalWatts, 
+                    totalAmps: totalAmps,
+                    roomsData: roomsData, 
+                    timestamp: window.serverTimestamp()
                 });
-            } catch (e) { console.error("Save error:", e); }
+                alert("ইউজার প্রজেক্ট সফলভাবে ক্লাউডে সেভ হয়েছে!");
+            } catch (e) { alert("সেভ করতে সমস্যা হয়েছে: " + e.message); }
         }
 
         async function openHistoryModal() {
             const modal = document.getElementById('historyModal');
             const content = document.getElementById('historyContent');
             modal.classList.remove('hidden');
-            content.innerHTML = `<p class="text-slate-400 italic">লোড হচ্ছে...</p>`;
+            content.innerHTML = `<p class="text-slate-400 italic">প্রজেক্ট লোড হচ্ছে...</p>`;
 
             try {
-                let currentUser = window.auth.currentUser;
-                if (!currentUser) { content.innerHTML = `<p class="text-red-400">দয়া করে প্রথমে লগইন করুন!</p>`; return; }
-                let userPhone = currentUser.email.split('@')[0];
-                const q = query(collection(window.db, "electrical_calculations"), where("userPhone", "==", userPhone));
-                const querySnapshot = await getDocs(q);
+                const querySnapshot = await getDocs(collection(window.db, "electrical_calculations"));
 
-                if (querySnapshot.empty) { content.innerHTML = `<p class="text-slate-400 italic">কোনো হিস্ট্রি নেই।</p>`; return; }
+                if (querySnapshot.empty) { content.innerHTML = `<p class="text-slate-400 italic">কোনো সেভ করা প্রজেক্ট নেই।</p>`; return; }
 
                 content.innerHTML = '';
                 querySnapshot.forEach((documentSnap) => {
@@ -663,18 +646,18 @@
                     let dateStr = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString('bn-BD') : 'তারিখ নেই';
                     content.innerHTML += `
                         <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
-                            <div class="flex justify-between items-center text-blue-400 font-bold">
-                                <span>সর্বমোট লোড: ${data.totalWatts} W</span>
-                                <span class="text-emerald-400">${data.totalAmps.toFixed(1)} A</span>
+                            <div class="flex justify-between items-center text-amber-400 font-bold">
+                                <span>প্রজেক্ট: ${data.clientName || 'অজানা'} (${data.clientPhone || ''})</span>
+                                <span class="text-emerald-400">${data.totalWatts} W</span>
                             </div>
                             <p class="text-[11px] text-slate-400">সময়: ${dateStr}</p>
                             <div class="flex gap-2 pt-1">
-                                <button onclick="loadHistoryData('${docId}')" class="px-3 py-1 bg-blue-600 text-white rounded-lg text-[11px]">ওপেন / মডিফাই</button>
+                                <button onclick="loadHistoryData('${docId}')" class="px-3 py-1 bg-blue-600 text-white rounded-lg text-[11px]">মডিফাই / ওপেন</button>
                                 <button onclick="deleteHistoryItem('${docId}')" class="px-3 py-1 bg-red-600 text-white rounded-lg text-[11px]">ডিলিট</button>
                             </div>
                         </div>`;
                 });
-            } catch (e) { content.innerHTML = `<p class="text-red-400">হিস্ট্রি লোড করতে সমস্যা হয়েছে।</p>`; }
+            } catch (e) { content.innerHTML = `<p class="text-red-400">হিস্ট্রি লোড ব্যর্থ।</p>`; }
         }
 
         async function loadHistoryData(docId) {
@@ -684,22 +667,24 @@
                     if (documentSnap.id === docId) {
                         let data = documentSnap.data();
                         roomsData = data.roomsData;
+                        document.getElementById('clientNameInput').value = data.clientName || '';
+                        document.getElementById('clientPhoneInput').value = data.clientPhone || '';
                         activeRoom = 0;
                         document.getElementById('roomCountInput').value = Object.keys(roomsData).length;
                         updateRoomSelector();
                         renderActiveRoomItems();
                         closeHistoryModal();
-                        alert("হিস্ট্রি সফলভাবে লোড হয়েছে!");
+                        alert("প্রজেক্ট সফলভাবে লোড হয়েছে! এখন মডিফাই করতে পারবেন।");
                     }
                 });
             } catch (e) { alert("ত্রুটি হয়েছে।"); }
         }
 
         async function deleteHistoryItem(docId) {
-            if(confirm("সত্যিই ডিলিট করতে চান?")) {
+            if(confirm("সত্যিই এই প্রজেক্ট ডিলিট করতে চান?")) {
                 try {
                     await deleteDoc(doc(window.db, "electrical_calculations", docId));
-                    alert("ডিলিট সম্পন্ন হয়েছে!");
+                    alert("ডিলিট সম্পন্ন!");
                     openHistoryModal();
                 } catch(e) { alert("ডিলিট ব্যর্থ।"); }
             }
@@ -785,7 +770,7 @@
 
             let shoppingListHTML = `
                 <div class="bg-emerald-950/40 p-4 rounded-2xl border border-emerald-500/30 space-y-2">
-                    <h3 class="font-bold text-sm text-emerald-400 border-b border-emerald-900 pb-1">🛒 ক্যাবল ও মালামালের সারসংক্ষেপ (শপিং লিস্ট):</h3>
+                    <h3 class="font-bold text-sm text-emerald-400 border-b border-emerald-900 pb-1">🛒 ক্যাবল ও মালামালের সারসংক্ষেপ:</h3>
                     <ul class="list-disc list-inside text-xs space-y-1 text-slate-300">
                         <li>মিটার থেকে DB মেইন তার: <b>${mainWire}</b> ক্যাবল</li>
                         <li>মূল আর্থিং ক্যাবল: <b>${earthWire}</b></li>
@@ -795,13 +780,17 @@
                         ${compiledMatList}
                     </ul>
                     <div class="pt-2 border-t border-emerald-900/50 text-[10px] text-emerald-300 text-right">
-                        ডেভেলপার: Rakibul Islam Rakib (Dinajpur)
+                        এডমিন ও ডেভেলপার: Rakibul Islam Rakib (Dinajpur)
                     </div>
                 </div>`;
 
+            let clientNameVal = document.getElementById('clientNameInput').value.trim() || "নামহীন প্রজেক্ট";
+            let clientPhoneVal = document.getElementById('clientPhoneInput').value.trim() || "নম্বর নেই";
+
             let summaryBox = `
                 <div class="bg-blue-950/60 p-4 rounded-2xl border border-blue-500/30 space-y-2">
-                    <div class="flex justify-between font-bold text-sm text-white"><span>সর্বমোট লোড:</span><span class="text-blue-400">${totalProjectWatts.toFixed(1)} W</span></div>
+                    <div class="text-amber-400 font-bold text-sm border-b border-slate-800 pb-1">ক্লায়েন্ট: ${clientNameVal} (${clientPhoneVal})</div>
+                    <div class="flex justify-between font-bold text-sm text-white pt-1"><span>সর্বমোট লোড:</span><span class="text-blue-400">${totalProjectWatts.toFixed(1)} W</span></div>
                     <div class="flex justify-between font-bold text-sm text-white"><span>সর্বমোট অ্যাম্পিয়ার:</span><span class="text-blue-400">${totalAmps.toFixed(2)} A</span></div>
                     <div class="border-t border-slate-800 pt-2 space-y-1 text-xs text-slate-300">
                         <div class="flex justify-between"><span>তার (মিটার থেকে DB):</span><span class="font-bold text-emerald-400">${mainWire}</span></div>
