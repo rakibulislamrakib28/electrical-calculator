@@ -216,8 +216,8 @@
             renderDropdown();
             updateRoomSelector();
             
-            // Push history state to handle physical back button
-            history.pushState({page: 'home'}, '', window.location.href);
+            // Push initial history state to trap physical back button
+            history.pushState(null, '', window.location.href);
 
             setTimeout(() => {
                 if(window.auth) {
@@ -234,20 +234,25 @@
             }, 500);
         };
 
-        // Handle Physical Back Button for Exit Confirmation
+        // Handle Physical Back Button for Exit Confirmation properly
         window.addEventListener('popstate', function (e) {
             const resultModal = document.getElementById('resultModal');
+            const exitModal = document.getElementById('exitModal');
             
-            // If result modal is open, close it first instead of exiting
+            // Push history state back immediately to keep trapping the back button
+            history.pushState(null, '', window.location.href);
+
             if (!resultModal.classList.contains('hidden')) {
                 closeResultPage();
-                history.pushState({page: 'home'}, '', window.location.href);
                 return;
             }
 
-            // Otherwise, show Exit Confirmation Modal (Yes/No)
-            document.getElementById('exitModal').classList.remove('hidden');
-            history.pushState({page: 'home'}, '', window.location.href);
+            if (!exitModal.classList.contains('hidden')) {
+                closeExitModal();
+                return;
+            }
+
+            exitModal.classList.remove('hidden');
         });
 
         function closeExitModal() {
@@ -255,7 +260,6 @@
         }
 
         function exitApp() {
-            // For Capacitor / Hybrid apps or browser windows
             if (navigator.app && navigator.app.exitApp) {
                 navigator.app.exitApp();
             } else if (window.isSecureContext && window.close) {
@@ -407,6 +411,14 @@
             renderActiveRoomItems();
         }
 
+        function updateItemWatt(idx, val) {
+            roomsData[activeRoom].items[idx].watt = parseFloat(val) || 0;
+        }
+
+        function updateItemQty(idx, val) {
+            roomsData[activeRoom].items[idx].qty = parseInt(val) || 1;
+        }
+
         function renderActiveRoomItems() {
             const rObj = roomsData[activeRoom];
             document.getElementById('activeRoomTitle').innerHTML = `🛠️ ${rObj.name} এর নির্বাচিত লোড তালিকা`;
@@ -424,11 +436,11 @@
                         <span class="font-bold text-slate-200 w-32 sm:w-40 break-words">${item.name}</span>
                         <div class="flex items-center gap-1">
                             <span>ওয়াট:</span>
-                            <input type="number" value="${item.watt}" oninput="roomsData[activeRoom].items[idx].watt = parseFloat(this.value)||0" class="w-16 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-white text-center">
+                            <input type="number" value="${item.watt}" oninput="updateItemWatt(${idx}, this.value)" class="w-16 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-white text-center">
                         </div>
                         <div class="flex items-center gap-1">
                             <span>সংখ্যা:</span>
-                            <input type="number" min="1" value="${item.qty}" oninput="roomsData[activeRoom].items[idx].qty = parseInt(this.value)||1" class="w-14 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-white text-center">
+                            <input type="number" min="1" value="${item.qty}" oninput="updateItemQty(${idx}, this.value)" class="w-14 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-white text-center">
                         </div>
                         <button onclick="roomsData[activeRoom].items.splice(${idx},1); renderActiveRoomItems();" class="text-red-400 bg-red-950/40 px-2 py-1 rounded">ডিলিট</button>
                     </div>
@@ -466,9 +478,11 @@
                     let rWatts = 0;
                     let rDetails = "";
                     r.items.forEach(i => {
-                        let sub = (parseFloat(i.watt) || 0) * (parseInt(i.qty) || 1);
+                        let w = parseFloat(i.watt) || 0;
+                        let q = parseInt(i.qty) || 1;
+                        let sub = w * q;
                         rWatts += sub;
-                        rDetails += `<div class="flex justify-between text-xs py-1 pl-3 border-b border-slate-800"><span class="text-slate-400">${i.name} (${i.qty}টি × ${i.watt}W)</span><span class="text-emerald-400 font-semibold">${sub} W</span></div>`;
+                        rDetails += `<div class="flex justify-between text-xs py-1 pl-3 border-b border-slate-800"><span class="text-slate-400">${i.name} (${q}টি × ${w}W)</span><span class="text-emerald-400 font-semibold">${sub} W</span></div>`;
                     });
 
                     let roomAmps = rWatts / 220;
