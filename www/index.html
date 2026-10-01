@@ -96,18 +96,24 @@
             </div>
         </div>
 
-        <!-- Appliances Grid Section -->
+        <!-- Appliances Dropdown & Custom Add Section -->
         <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-2xl shadow-xl backdrop-blur-md space-y-4">
-            <h2 class="font-bold text-base text-blue-400 border-b border-slate-700 pb-2">💡 ডিভাইস সিলেক্ট করুন (ক্লিক করলেই ঘরে যুক্ত হবে)</h2>
-            <div id="appliancesGrid" class="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                <!-- Dynamically filled -->
+            <h2 class="font-bold text-base text-blue-400 border-b border-slate-700 pb-2">💡 ডিভাইস নির্বাচন করুন</h2>
+            
+            <!-- Dropdown Selection Section -->
+            <div class="flex gap-2 items-center">
+                <select id="deviceDropdown" onchange="onDeviceSelect()" class="flex-1 px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white">
+                    <option value="">-- ডিভাইস সিলেক্ট করুন --</option>
+                </select>
+                <!-- Plus Button to toggle Custom Add Section -->
+                <button onclick="toggleCustomSection()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-lg transition shadow-lg" title="নতুন ডিভাইস যোগ করুন">➕</button>
             </div>
 
             <!-- Custom Add Item Section -->
-            <div class="pt-3 border-t border-slate-700 flex flex-col sm:flex-row gap-2 items-center bg-slate-900/60 p-3 rounded-xl border border-slate-700">
+            <div id="customSection" class="pt-3 border-t border-slate-700 flex flex-col sm:flex-row gap-2 items-center bg-slate-900/60 p-3 rounded-xl border border-slate-700 hidden">
                 <input type="text" id="customName" placeholder="অন্যান্য ডিভাইস (যেমন: ওভেন)" class="w-full sm:flex-1 px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
                 <input type="number" id="customWatt" placeholder="ওয়াট (W)" class="w-full sm:w-24 px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
-                <button onclick="addNewCustomItem()" class="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-xl text-xs transition shadow-lg">➕ যোগ করুন</button>
+                <button onclick="addNewCustomItem()" class="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-xl text-xs transition shadow-lg">সংরক্ষণ করুন</button>
             </div>
         </div>
 
@@ -115,7 +121,7 @@
         <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-2xl shadow-xl backdrop-blur-md space-y-4">
             <h2 id="activeRoomTitle" class="font-bold text-base text-emerald-400 border-b border-slate-700 pb-2">🛠️ রুম ১ এর নির্বাচিত লোড তালিকা</h2>
             <div id="roomActiveItems" class="space-y-3">
-                <p class="text-xs text-slate-400 italic">উপরের গ্রিড থেকে ডিভাইসে ক্লিক করে এখানে যুক্ত করুন।</p>
+                <p class="text-xs text-slate-400 italic">উপরের ড্রপডাউন থেকে ডিভাইস সিলেক্ট করে এখানে যুক্ত করুন।</p>
             </div>
         </div>
 
@@ -204,15 +210,15 @@
 
         let roomsData = { 0: { name: "রুম ১", items: [] } };
         let activeRoom = 0;
-        let backPressTimer = 0;
         let isRegisterMode = false;
 
         window.onload = function() {
-            renderGrid();
+            renderDropdown();
             updateRoomSelector();
+            
+            // Push history state to handle physical back button
             history.pushState({page: 'home'}, '', window.location.href);
 
-            // Check if user is already logged in
             setTimeout(() => {
                 if(window.auth) {
                     window.onAuthStateChanged(window.auth, (user) => {
@@ -228,7 +234,37 @@
             }, 500);
         };
 
-        // Toggle between Login and Register modes
+        // Handle Physical Back Button for Exit Confirmation
+        window.addEventListener('popstate', function (e) {
+            const resultModal = document.getElementById('resultModal');
+            
+            // If result modal is open, close it first instead of exiting
+            if (!resultModal.classList.contains('hidden')) {
+                closeResultPage();
+                history.pushState({page: 'home'}, '', window.location.href);
+                return;
+            }
+
+            // Otherwise, show Exit Confirmation Modal (Yes/No)
+            document.getElementById('exitModal').classList.remove('hidden');
+            history.pushState({page: 'home'}, '', window.location.href);
+        });
+
+        function closeExitModal() {
+            document.getElementById('exitModal').classList.add('hidden');
+        }
+
+        function exitApp() {
+            // For Capacitor / Hybrid apps or browser windows
+            if (navigator.app && navigator.app.exitApp) {
+                navigator.app.exitApp();
+            } else if (window.isSecureContext && window.close) {
+                window.close();
+            } else {
+                window.location.href = "about:blank";
+            }
+        }
+
         function toggleAuthMode() {
             isRegisterMode = !isRegisterMode;
             const title = document.getElementById('authTitle');
@@ -249,7 +285,6 @@
             }
         }
 
-        // Handle Login or Registration
         function handleLogin() {
             let phone = document.getElementById('loginPhone').value.trim();
             let password = document.getElementById('loginPassword').value.trim();
@@ -295,17 +330,27 @@
             });
         }
 
-        function renderGrid() {
-            const grid = document.getElementById('appliancesGrid');
-            grid.innerHTML = '';
-            availableItems.forEach(item => {
-                grid.innerHTML += `
-                    <button onclick="addItemToRoom('${item.name}', ${item.watt})" class="p-2.5 bg-slate-900 hover:bg-blue-600/30 border border-slate-700 hover:border-blue-500 rounded-xl text-center transition flex flex-col items-center justify-center gap-1 shadow-md">
-                        <span class="text-xs font-semibold text-slate-200 truncate w-full">${item.name}</span>
-                        <span class="text-[9px] text-emerald-400 font-medium">+ যোগ</span>
-                    </button>
-                `;
+        function renderDropdown() {
+            const dropdown = document.getElementById('deviceDropdown');
+            dropdown.innerHTML = `<option value="">-- ডিভাইস সিলেক্ট করুন --</option>`;
+            availableItems.forEach((item, index) => {
+                dropdown.innerHTML += `<option value="${index}">${item.name} (${item.watt}W)</option>`;
             });
+        }
+
+        function onDeviceSelect() {
+            const dropdown = document.getElementById('deviceDropdown');
+            const selectedIndex = dropdown.value;
+            if (selectedIndex === "") return;
+
+            const item = availableItems[selectedIndex];
+            addItemToRoom(item.name, item.watt);
+            dropdown.value = "";
+        }
+
+        function toggleCustomSection() {
+            const section = document.getElementById('customSection');
+            section.classList.toggle('hidden');
         }
 
         function addNewCustomItem() {
@@ -320,7 +365,8 @@
             availableItems.push({ name: name, watt: watt });
             document.getElementById('customName').value = '';
             document.getElementById('customWatt').value = '';
-            renderGrid();
+            document.getElementById('customSection').classList.add('hidden');
+            renderDropdown();
             alert(`"${name}" সফলভাবে যুক্ত হয়েছে!`);
         }
 
@@ -375,14 +421,14 @@
             rObj.items.forEach((item, idx) => {
                 container.innerHTML += `
                     <div class="flex items-center justify-between bg-slate-900 p-3 rounded-xl border border-slate-700 text-xs gap-2">
-                        <span class="font-bold text-slate-200 w-24 truncate">${item.name}</span>
+                        <span class="font-bold text-slate-200 w-32 sm:w-40 break-words">${item.name}</span>
                         <div class="flex items-center gap-1">
                             <span>ওয়াট:</span>
                             <input type="number" value="${item.watt}" oninput="roomsData[activeRoom].items[idx].watt = parseFloat(this.value)||0" class="w-16 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-white text-center">
                         </div>
                         <div class="flex items-center gap-1">
                             <span>সংখ্যা:</span>
-                            <input type="number" min="1" value="${item.qty}" oninput="roomsData[activeRoom].items[idx].qty = parseInt(this.value)||0" class="w-14 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-white text-center">
+                            <input type="number" min="1" value="${item.qty}" oninput="roomsData[activeRoom].items[idx].qty = parseInt(this.value)||1" class="w-14 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-white text-center">
                         </div>
                         <button onclick="roomsData[activeRoom].items.splice(${idx},1); renderActiveRoomItems();" class="text-red-400 bg-red-950/40 px-2 py-1 rounded">ডিলিট</button>
                     </div>
@@ -390,7 +436,6 @@
             });
         }
 
-        // Save calculation to Firestore Database automatically
         async function saveResultToFirestore(totalWatts, totalAmps) {
             try {
                 let currentUser = window.auth.currentUser;
@@ -421,7 +466,7 @@
                     let rWatts = 0;
                     let rDetails = "";
                     r.items.forEach(i => {
-                        let sub = i.watt * i.qty;
+                        let sub = (parseFloat(i.watt) || 0) * (parseInt(i.qty) || 1);
                         rWatts += sub;
                         rDetails += `<div class="flex justify-between text-xs py-1 pl-3 border-b border-slate-800"><span class="text-slate-400">${i.name} (${i.qty}টি × ${i.watt}W)</span><span class="text-emerald-400 font-semibold">${sub} W</span></div>`;
                     });
@@ -470,7 +515,7 @@
             let rccbRating = 25;
             if (totalAmps > 25 && totalAmps <= 40) rccbRating = 40;
             else if (totalAmps > 40) rccbRating = 63;
-            let rccbText = useRccb ? `হ্যাঁ (${rccbRating} Amp, 30mA RCCB)` : "প্রযোজ্য নয়";
+            let rccbTest = useRccb ? `হ্যাঁ (${rccbRating} Amp, 30mA RCCB)` : "প্রযোজ্য নয়";
 
             let summaryBox = `
                 <div class="bg-blue-950/60 p-4 rounded-2xl border border-blue-500/30 space-y-2">
@@ -479,7 +524,7 @@
                     <div class="border-t border-slate-800 pt-2 space-y-1 text-xs text-slate-300">
                         <div class="flex justify-between"><span>মেইন ইনপুট তার:</span><span class="font-bold text-emerald-400">${mainWire}</span></div>
                         <div class="flex justify-between"><span>মেইন MCB (সবার জন্য):</span><span class="font-bold text-purple-400">${mainMCB}</span></div>
-                        <div class="flex justify-between"><span>RCCB প্রটেকশন:</span><span class="font-bold text-indigo-400">${rccbText}</span></div>
+                        <div class="flex justify-between"><span>RCCB প্রটেকশন:</span><span class="font-bold text-indigo-400">${rccbTest}</span></div>
                     </div>
                 </div>
             `;
@@ -492,34 +537,6 @@
 
         function closeResultPage() {
             document.getElementById('resultModal').classList.add('hidden');
-        }
-
-        window.addEventListener('popstate', function (e) {
-            const currentTime = new Date().getTime();
-            
-            if (!document.getElementById('resultModal').classList.contains('hidden')) {
-                closeResultPage();
-                history.pushState({page: 'home'}, '', window.location.href);
-                return;
-            }
-
-            if (backPressTimer && (currentTime - backPressTimer < 2500)) {
-                document.getElementById('exitModal').classList.remove('hidden');
-            } else {
-                backPressTimer = currentTime;
-                history.pushState({page: 'home'}, '', window.location.href);
-            }
-        });
-
-        function closeExitModal() {
-            document.getElementById('exitModal').classList.add('hidden');
-            backPressTimer = 0;
-            history.pushState({page: 'home'}, '', window.location.href);
-        }
-
-        function exitApp() {
-            window.close();
-            window.location.href = "about:blank";
         }
 
         function toggleSidebar(open) {
