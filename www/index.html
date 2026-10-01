@@ -118,7 +118,7 @@
 
         <!-- Protection -->
         <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-2xl shadow-xl backdrop-blur-md space-y-3">
-            <h2 class="font-bold text-base text-blue-400 border-b border-slate-700 pb-2">🛡️ সুরক্ষা ডিভাইস</h2>
+            <h2 class="font-bold text-base text-blue-400 border-b border-slate-700 pb-2">🛡️️ সুরক্ষা ডিভাইস</h2>
             <div class="flex items-center gap-3">
                 <input type="checkbox" id="useRccb" checked class="w-5 h-5 accent-blue-500 rounded">
                 <label for="useRccb" class="font-medium text-slate-300 text-sm cursor-pointer">RCCB (Residual Current Circuit Breaker) যুক্ত করুন</label>
@@ -161,14 +161,15 @@
         import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // আপনার ফায়ারবেস কনফিগারেশন এখানে যুক্ত করুন (ফায়ারবেস প্রজেক্ট সেটিংস থেকে পেয়ে যাবেন)
+        // আপনার ফায়ারবেস কনফিগারেশন (স্ক্রিনশট থেকে নেওয়া)
         const firebaseConfig = {
-          apiKey: "YOUR_API_KEY",
-          authDomain: "YOUR_AUTH_DOMAIN",
-          projectId: "YOUR_PROJECT_ID",
-          storageBucket: "YOUR_STORAGE_BUCKET",
-          messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-          appId: "YOUR_APP_ID"
+          apiKey: "AIzaSyAi_L2wIpbxTpM7MAir42vVjbwquqxTgL4",
+          authDomain: "electrical-calculator-a44be.firebaseapp.com",
+          projectId: "electrical-calculator-a44be",
+          storageBucket: "electrical-calculator-a44be.appspot.com",
+          messagingSenderId: "974216886708",
+          appId: "1:974216886708:web:7db5667c7019bcbxaad5ef",
+          measurementId: "G-LZVWN9W6PL"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -212,7 +213,7 @@
         function sendOTP() {
             const phoneNumber = document.getElementById('phoneNumber').value.trim();
             if (!phoneNumber) {
-                alert("দয়া করে সঠিক মোবাইল নম্বর দিন!");
+                alert("দয়া করে সঠিক মোবাইল নম্বর দিন! (যেমন: +8801XXXXXXXXX)");
                 return;
             }
 
@@ -231,7 +232,7 @@
                     alert("আপনার নম্বরে একটি ওটিপি (OTP) কোড পাঠানো হয়েছে!");
                 }).catch((error) => {
                     console.error("SMS পাঠাতে সমস্যা হয়েছে:", error);
-                    alert("এসএমএস পাঠানো যায়নি। আবার চেষ্টা করুন।");
+                    alert("এসএমএস পাঠানো যায়নি। নম্বরটি +880 সহ দিয়েছেন কিনা চেক করুন।");
                 });
         }
 
