@@ -52,28 +52,17 @@
         </div>
     </header>
 
-    <!-- Sidebar Menu (MCB & Wiring Standard Info) -->
+    <!-- Sidebar Menu -->
     <div id="sidebar" class="fixed inset-y-0 left-0 w-80 bg-slate-900 border-r border-slate-800 z-50 transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
         <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-950">
-            <h2 class="font-bold text-blue-400 text-base">🛠 MCB ও তারের স্ট্যান্ডার্ড গাইড</h2>
+            <h2 class="font-bold text-blue-400 text-base">🛠 বাজারের MCB রেটিং তালিকা</h2>
             <button onclick="toggleSidebar(false)" class="text-slate-400 hover:text-white p-1">✕</button>
         </div>
-        <div class="p-4 overflow-y-auto space-y-4 text-xs text-slate-300 flex-1">
+        <div class="p-4 overflow-y-auto space-y-3 text-xs text-slate-300 flex-1">
             <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700 space-y-1">
-                <h3 class="font-bold text-blue-300 text-sm">১. কম লোড (লাইট, ফ্যান)</h3>
-                <p class="text-slate-400">রেটিং: 1A, 2A, 3A, 4A, 6A, 10A (লাইট ও ছোট সরঞ্জামের জন্য)। তার: 1.5 RM</p>
-            </div>
-            <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700 space-y-1">
-                <h3 class="font-bold text-blue-300 text-sm">২. মাঝারি লোড (সকেট, ফ্রিজ, টিভি)</h3>
-                <p class="text-slate-400">রেটিং: 16A, 20A। তার: 2.5 RM</p>
-            </div>
-            <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700 space-y-1">
-                <h3 class="font-bold text-blue-300 text-sm">৩. ভারী লোড (এসি, গিজার, রাইস কুকার)</h3>
-                <p class="text-slate-400">রেটিং: 25A, 32A, 40A। তার: 4.0 RM বা তার বেশি</p>
-            </div>
-            <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700 space-y-1">
-                <h3 class="font-bold text-blue-300 text-sm">৪. মেইন সুইচ বা উচ্চ ক্ষমতা</h3>
-                <p class="text-slate-400">রেটিং: 50A, 63A বা তার বেশি।</p>
+                <h3 class="font-bold text-blue-300 text-sm">বাজারের স্ট্যান্ডার্ড MCB সাইজ:</h3>
+                <p class="text-slate-300 font-mono">2A, 4A, 8A, 10A, 12A, 16A, 20A, 25A, 32A, 40A, 50A, 63A</p>
+                <p class="text-[11px] text-slate-400 pt-1">লোড অনুযায়ী নিখুঁত ব্র্রেকার ও তারের সাইজ অটোমেটিক নির্ধারিত হয়।</p>
             </div>
         </div>
     </div>
@@ -212,6 +201,8 @@
             { name: "ওয়াশিং মেশিন", watt: 500 }
         ];
 
+        const marketMCBs = [2, 4, 8, 10, 12, 16, 20, 25, 32, 40, 50, 63];
+
         let roomsData = { 0: { name: "রুম ১", items: [] } };
         let activeRoom = 0;
         let isRegisterMode = false;
@@ -220,7 +211,8 @@
             renderDropdown();
             updateRoomSelector();
             
-            history.pushState(null, '', window.location.href);
+            // Push initial history state for back button trapping
+            history.pushState({page: 'home'}, '', window.location.href);
 
             setTimeout(() => {
                 if(window.auth) {
@@ -237,11 +229,13 @@
             }, 500);
         };
 
+        // Proper Back Button Handling without accidental exits
         window.addEventListener('popstate', function (e) {
             const resultModal = document.getElementById('resultModal');
             const exitModal = document.getElementById('exitModal');
             
-            history.pushState(null, '', window.location.href);
+            // Re-push state to maintain history trap
+            history.pushState({page: 'home'}, '', window.location.href);
 
             if (!resultModal.classList.contains('hidden')) {
                 closeResultPage();
@@ -261,6 +255,8 @@
         }
 
         function exitApp() {
+            // Allow exit when Yes is clicked in confirmation dialog
+            window.removeEventListener('popstate', arguments.callee);
             if (navigator.app && navigator.app.exitApp) {
                 navigator.app.exitApp();
             } else if (window.isSecureContext && window.close) {
@@ -484,11 +480,10 @@
                         let sub = w * q;
                         rWatts += sub;
 
-                        // Standard wire recommendation based on load types (1.5 RM, 2.5 RM, 4.0 RM)
                         let wireRec = "1.5 RM তার (কম লোড সার্কিট)";
                         let nameLower = i.name.toLowerCase();
                         if (nameLower.includes('এসি') || nameLower.includes('রাইস কুকার') || nameLower.includes('ওভেন') || nameLower.includes('মোটর') || sub > 1000) {
-                            wireRec = "4.0 RM তার (ভারী লোড সার্কিট)";
+                            wireRec = "4.0 RM তার (ভারী লোড সার্কিট - DB থেকে সরাসরি)";
                         } else if (nameLower.includes('ফ্রিজ') || nameLower.includes('ওয়াশিং') || nameLower.includes('আয়রন') || sub > 500) {
                             wireRec = "2.5 RM তার (মাঝারি লোড সার্কিট)";
                         }
@@ -503,13 +498,11 @@
                             </div>`;
                     });
 
-                    // Room MCB based on standard ratings: 6A, 10A, 16A, 20A, 25A, 32A, 40A, 50A, 63A
                     let roomAmps = rWatts / 220;
-                    let roomMCB = "6 Amp MCB";
-                    const standardMCBs = [6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100];
-                    for (let mcb of standardMCBs) {
-                        if (roomAmps * 1.25 <= mcb) { roomMCB = mcb + " Amp MCB"; break; }
-                        roomMCB = "100+ Amp MCB";
+                    let roomMCB = "6A MCB";
+                    for (let mcb of marketMCBs) {
+                        if (roomAmps * 1.25 <= mcb) { roomMCB = mcb + "A MCB"; break; }
+                        roomMCB = "63A+ MCB";
                     }
 
                     totalProjectWatts += rWatts;
@@ -532,26 +525,24 @@
             }
 
             let totalAmps = totalProjectWatts / 220;
+            
             let mainWire = "2.5 RM";
             if (totalAmps > 40) mainWire = "10.0 RM";
             else if (totalAmps > 25) mainWire = "6.0 RM";
             else if (totalAmps > 15) mainWire = "4.0 RM";
 
-            // Main MCB Calculation matching standard ratings
             let mainMCBVal = 6;
-            let mainMCB = "6 Amp MCB";
-            const standardMCBs = [6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100];
-            for (let mcb of standardMCBs) {
+            let mainMCB = "6A MCB";
+            for (let mcb of marketMCBs) {
                 if (totalAmps * 1.25 <= mcb) { 
                     mainMCBVal = mcb;
-                    mainMCB = mcb + " Amp MCB"; 
+                    mainMCB = mcb + "A MCB"; 
                     break; 
                 }
-                mainMCBVal = 100;
-                mainMCB = "100+ Amp MCB";
+                mainMCBVal = 63;
+                mainMCB = "63A+ MCB";
             }
 
-            // RCCB Rating synchronized according to Main MCB load ratings
             let rccbRating = 25;
             if (mainMCBVal <= 16) rccbRating = 25;
             else if (mainMCBVal <= 25) rccbRating = 25;
@@ -560,15 +551,15 @@
             else rccbRating = 63;
 
             const useRccb = document.getElementById('useRccb').checked;
-            let rccbText = useRccb ? `হ্যাঁ (${rccbRating} Amp, 30mA RCCB)` : "প্রযোজ্য নয়";
+            let rccbText = useRccb ? `হ্যাঁ (${rccbRating}A, 30mA RCCB)` : "প্রযোজ্য নয়";
 
             let summaryBox = `
                 <div class="bg-blue-950/60 p-4 rounded-2xl border border-blue-500/30 space-y-2">
                     <div class="flex justify-between font-bold text-sm text-white"><span>সর্বমোট লোড:</span><span class="text-blue-400">${totalProjectWatts.toFixed(1)} W</span></div>
                     <div class="flex justify-between font-bold text-sm text-white"><span>সর্বমোট অ্যাম্পিয়ার:</span><span class="text-blue-400">${totalAmps.toFixed(2)} A</span></div>
                     <div class="border-t border-slate-800 pt-2 space-y-1 text-xs text-slate-300">
-                        <div class="flex justify-between"><span>মেইন ইনপুট তার:</span><span class="font-bold text-emerald-400">${mainWire}</span></div>
-                        <div class="flex justify-between"><span>মেইন MCB (সবার জন্য):</span><span class="font-bold text-purple-400">${mainMCB}</span></div>
+                        <div class="flex justify-between"><span>মিটার থেকে DB বক্সের তার:</span><span class="font-bold text-emerald-400">${mainWire}</span></div>
+                        <div class="flex justify-between"><span>মেইন MCB (বাজারের সাইজ):</span><span class="font-bold text-purple-400">${mainMCB}</span></div>
                         <div class="flex justify-between"><span>RCCB প্রটেকশন:</span><span class="font-bold text-indigo-400">${rccbText}</span></div>
                     </div>
                 </div>
@@ -576,8 +567,6 @@
 
             document.getElementById('fullReportContent').innerHTML = summaryBox + reportHTML;
             document.getElementById('resultModal').classList.remove('hidden');
-
-            saveResultToFirestore(totalProjectWatts, totalAmps);
         }
 
         function closeResultPage() {
