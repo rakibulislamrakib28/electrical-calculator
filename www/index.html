@@ -52,24 +52,28 @@
         </div>
     </header>
 
-    <!-- Sidebar Menu -->
+    <!-- Sidebar Menu (MCB & Wiring Standard Info) -->
     <div id="sidebar" class="fixed inset-y-0 left-0 w-80 bg-slate-900 border-r border-slate-800 z-50 transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
         <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-950">
-            <h2 class="font-bold text-blue-400 text-base">🛠 মালামাল ও কাজের বিবরণ</h2>
+            <h2 class="font-bold text-blue-400 text-base">🛠 MCB ও তারের স্ট্যান্ডার্ড গাইড</h2>
             <button onclick="toggleSidebar(false)" class="text-slate-400 hover:text-white p-1">✕</button>
         </div>
-        <div class="p-4 overflow-y-auto space-y-4 text-sm text-slate-300 flex-1">
-            <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700">
-                <h3 class="font-bold text-blue-300 mb-1">১. MCB (Circuit Breaker)</h3>
-                <p class="text-xs text-slate-400">লোডের অ্যাম্পিয়ার অনুযায়ী ছোট-বড় (যেমন: 10A, 16A, 32A, 63A) ব্যবহার করতে হয়।</p>
+        <div class="p-4 overflow-y-auto space-y-4 text-xs text-slate-300 flex-1">
+            <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700 space-y-1">
+                <h3 class="font-bold text-blue-300 text-sm">১. কম লোড (লাইট, ফ্যান)</h3>
+                <p class="text-slate-400">রেটিং: 1A, 2A, 3A, 4A, 6A, 10A (লাইট ও ছোট সরঞ্জামের জন্য)। তার: 1.5 RM</p>
             </div>
-            <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700">
-                <h3 class="font-bold text-blue-300 mb-1">২. RCCB</h3>
-                <p class="text-xs text-slate-400">মোট লোডের ওপর ভিত্তি করে 25A, 40A বা 63A (30mA) ক্ষমতার RCCB দিতে হয়।</p>
+            <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700 space-y-1">
+                <h3 class="font-bold text-blue-300 text-sm">২. মাঝারি লোড (সকেট, ফ্রিজ, টিভি)</h3>
+                <p class="text-slate-400">রেটিং: 16A, 20A। তার: 2.5 RM</p>
             </div>
-            <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700">
-                <h3 class="font-bold text-blue-300 mb-1">৩. তার বা ক্যাবল (RM)</h3>
-                <p class="text-xs text-slate-400">লাইট-ফ্যানের জন্য ১.৫ RM, সকেট-ফ্রিজের জন্য ২.৫ RM এবং হেভি লোডের জন্য ৪ RM বা তার বেশি।</p>
+            <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700 space-y-1">
+                <h3 class="font-bold text-blue-300 text-sm">৩. ভারী লোড (এসি, গিজার, রাইস কুকার)</h3>
+                <p class="text-slate-400">রেটিং: 25A, 32A, 40A। তার: 4.0 RM বা তার বেশি</p>
+            </div>
+            <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700 space-y-1">
+                <h3 class="font-bold text-blue-300 text-sm">৪. মেইন সুইচ বা উচ্চ ক্ষমতা</h3>
+                <p class="text-slate-400">রেটিং: 50A, 63A বা তার বেশি।</p>
             </div>
         </div>
     </div>
@@ -216,7 +220,6 @@
             renderDropdown();
             updateRoomSelector();
             
-            // Push initial history state to trap physical back button
             history.pushState(null, '', window.location.href);
 
             setTimeout(() => {
@@ -234,12 +237,10 @@
             }, 500);
         };
 
-        // Handle Physical Back Button for Exit Confirmation properly
         window.addEventListener('popstate', function (e) {
             const resultModal = document.getElementById('resultModal');
             const exitModal = document.getElementById('exitModal');
             
-            // Push history state back immediately to keep trapping the back button
             history.pushState(null, '', window.location.href);
 
             if (!resultModal.classList.contains('hidden')) {
@@ -482,11 +483,29 @@
                         let q = parseInt(i.qty) || 1;
                         let sub = w * q;
                         rWatts += sub;
-                        rDetails += `<div class="flex justify-between text-xs py-1 pl-3 border-b border-slate-800"><span class="text-slate-400">${i.name} (${q}টি × ${w}W)</span><span class="text-emerald-400 font-semibold">${sub} W</span></div>`;
+
+                        // Standard wire recommendation based on load types (1.5 RM, 2.5 RM, 4.0 RM)
+                        let wireRec = "1.5 RM তার (কম লোড সার্কিট)";
+                        let nameLower = i.name.toLowerCase();
+                        if (nameLower.includes('এসি') || nameLower.includes('রাইস কুকার') || nameLower.includes('ওভেন') || nameLower.includes('মোটর') || sub > 1000) {
+                            wireRec = "4.0 RM তার (ভারী লোড সার্কিট)";
+                        } else if (nameLower.includes('ফ্রিজ') || nameLower.includes('ওয়াশিং') || nameLower.includes('আয়রন') || sub > 500) {
+                            wireRec = "2.5 RM তার (মাঝারি লোড সার্কিট)";
+                        }
+
+                        rDetails += `
+                            <div class="flex flex-col text-xs py-1.5 pl-3 border-b border-slate-800 gap-0.5">
+                                <div class="flex justify-between">
+                                    <span class="text-slate-300 font-medium">${i.name} (${q}টি × ${w}W)</span>
+                                    <span class="text-emerald-400 font-semibold">${sub} W</span>
+                                </div>
+                                <div class="text-[11px] text-cyan-400">🔌 তারের সাইজ: <b>${wireRec}</b></div>
+                            </div>`;
                     });
 
+                    // Room MCB based on standard ratings: 6A, 10A, 16A, 20A, 25A, 32A, 40A, 50A, 63A
                     let roomAmps = rWatts / 220;
-                    let roomMCB = "10 Amp MCB";
+                    let roomMCB = "6 Amp MCB";
                     const standardMCBs = [6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100];
                     for (let mcb of standardMCBs) {
                         if (roomAmps * 1.25 <= mcb) { roomMCB = mcb + " Amp MCB"; break; }
@@ -501,7 +520,7 @@
                                 <span class="text-emerald-400">লোডের পরিমাণ: ${rWatts} W (${roomAmps.toFixed(1)}A)</span>
                             </div>
                             ${rDetails}
-                            <div class="text-[11px] text-purple-300 pt-1">💡 এই রুমের সাব-সার্কিট ব্র্রেকার (MCB): <b>${roomMCB}</b></div>
+                            <div class="text-[11px] text-purple-300 pt-1">💡 এই রুমের সাব-সার্কিট ব্রেকার (MCB): <b>${roomMCB}</b></div>
                         </div>
                     `;
                 }
@@ -518,18 +537,30 @@
             else if (totalAmps > 25) mainWire = "6.0 RM";
             else if (totalAmps > 15) mainWire = "4.0 RM";
 
-            let mainMCB = "10 Amp";
+            // Main MCB Calculation matching standard ratings
+            let mainMCBVal = 6;
+            let mainMCB = "6 Amp MCB";
             const standardMCBs = [6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100];
             for (let mcb of standardMCBs) {
-                if (totalAmps * 1.25 <= mcb) { mainMCB = mcb + " Amp MCB"; break; }
+                if (totalAmps * 1.25 <= mcb) { 
+                    mainMCBVal = mcb;
+                    mainMCB = mcb + " Amp MCB"; 
+                    break; 
+                }
+                mainMCBVal = 100;
                 mainMCB = "100+ Amp MCB";
             }
 
-            const useRccb = document.getElementById('useRccb').checked;
+            // RCCB Rating synchronized according to Main MCB load ratings
             let rccbRating = 25;
-            if (totalAmps > 25 && totalAmps <= 40) rccbRating = 40;
-            else if (totalAmps > 40) rccbRating = 63;
-            let rccbTest = useRccb ? `হ্যাঁ (${rccbRating} Amp, 30mA RCCB)` : "প্রযোজ্য নয়";
+            if (mainMCBVal <= 16) rccbRating = 25;
+            else if (mainMCBVal <= 25) rccbRating = 25;
+            else if (mainMCBVal <= 32) rccbRating = 40;
+            else if (mainMCBVal <= 50) rccbRating = 63;
+            else rccbRating = 63;
+
+            const useRccb = document.getElementById('useRccb').checked;
+            let rccbText = useRccb ? `হ্যাঁ (${rccbRating} Amp, 30mA RCCB)` : "প্রযোজ্য নয়";
 
             let summaryBox = `
                 <div class="bg-blue-950/60 p-4 rounded-2xl border border-blue-500/30 space-y-2">
@@ -538,7 +569,7 @@
                     <div class="border-t border-slate-800 pt-2 space-y-1 text-xs text-slate-300">
                         <div class="flex justify-between"><span>মেইন ইনপুট তার:</span><span class="font-bold text-emerald-400">${mainWire}</span></div>
                         <div class="flex justify-between"><span>মেইন MCB (সবার জন্য):</span><span class="font-bold text-purple-400">${mainMCB}</span></div>
-                        <div class="flex justify-between"><span>RCCB প্রটেকশন:</span><span class="font-bold text-indigo-400">${rccbTest}</span></div>
+                        <div class="flex justify-between"><span>RCCB প্রটেকশন:</span><span class="font-bold text-indigo-400">${rccbText}</span></div>
                     </div>
                 </div>
             `;
