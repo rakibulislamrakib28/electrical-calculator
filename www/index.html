@@ -19,8 +19,27 @@
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-blue-950 text-slate-100 min-h-screen pb-12">
 
+    <!-- Splash Screen / Intro Loading Theme -->
+    <div id="splashScreen" class="fixed inset-0 bg-slate-950 z-50 flex flex-col items-center justify-center p-4 transition-opacity duration-700">
+        <div class="bg-slate-900 border border-blue-500/30 p-8 rounded-3xl shadow-2xl text-center space-y-4 max-w-sm w-full backdrop-blur-md">
+            <div class="w-16 h-16 bg-blue-600/20 border border-blue-500 rounded-2xl mx-auto flex items-center justify-center text-3xl animate-bounce">⚡</div>
+            <h1 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">স্মার্ট ইলেকট্রিক ক্যালকুলেটর</h1>
+            <div class="pt-2 border-t border-slate-800 space-y-1">
+                <p class="text-xs text-slate-300 font-medium">ডেভেলপার ও পরিচলনায়:</p>
+                <p class="text-sm font-bold text-emerald-400">Rakibul Islam Rakib</p>
+                <p class="text-[11px] text-blue-300/80">ফেইসবুক পেজ: Rakibul islam Rakib Dinajpur</p>
+            </div>
+            <div class="pt-3">
+                <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                    <div id="splashBar" class="bg-gradient-to-r from-blue-500 to-emerald-500 h-full w-0 transition-all duration-1000"></div>
+                </div>
+                <p class="text-[10px] text-slate-500 mt-2 animate-pulse">অ্যাপ লোড হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন...</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Login / Registration Modal Overlay -->
-    <div id="authModal" class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center p-4">
+    <div id="authModal" class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center p-4 hidden">
         <div class="max-w-md w-full bg-slate-900 border border-slate-700 p-6 rounded-3xl shadow-2xl space-y-5">
             <h2 id="authTitle" class="text-xl font-bold text-blue-400 text-center">📱 মোবাইল নম্বর দিয়ে লগইন</h2>
             <p id="authSub" class="text-xs text-slate-400 text-center">আপনার মোবাইল নম্বর এবং শুধু সংখ্যা দিয়ে পিন/পাসওয়ার্ড দিন।</p>
@@ -55,7 +74,7 @@
         <div class="flex items-center gap-2">
             <button onclick="openHistoryModal()" class="text-[11px] bg-blue-900/60 border border-blue-600 text-blue-300 px-2.5 py-1.5 rounded-lg flex items-center gap-1">📁 হিস্ট্রি</button>
             <div id="userPhoneDisplay" class="text-xs text-emerald-400 font-medium bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 hidden sm:block"></div>
-            <button onclick="logoutUser()" class="text-[11px] text-red-400 bg-red-950/40 px-2.5 py-1.5 rounded-lg border border-red-900/50">লগআউট</button>
+            <button onclick="confirmLogout()" class="text-[11px] text-red-400 bg-red-950/40 px-2.5 py-1.5 rounded-lg border border-red-900/50">লগআউট</button>
         </div>
     </header>
 
@@ -69,6 +88,10 @@
             <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700 space-y-1">
                 <h3 class="font-bold text-blue-300 text-sm">বাজারের স্ট্যান্ডার্ড MCB সাইজ:</h3>
                 <p class="text-slate-300 font-mono">2A, 4A, 8A, 10A, 12A, 16A, 20A, 25A, 32A, 40A, 50A, 63A</p>
+            </div>
+            <div class="p-3 bg-slate-900 rounded-xl border border-slate-700 text-center">
+                <p class="text-[11px] text-emerald-400 font-bold">Rakibul islam Rakib Dinajpur</p>
+                <p class="text-[10px] text-slate-400">অ্যাপ ভার্সন ২.০</p>
             </div>
         </div>
     </div>
@@ -107,17 +130,17 @@
             </div>
 
             <div id="customSection" class="pt-3 border-t border-slate-700 flex flex-col sm:flex-row gap-2 items-center bg-slate-900/60 p-3 rounded-xl border border-slate-700 hidden">
-                <input type="text" id="customName" placeholder="অন্যান্য মালামাল (যেমন: স্পেশাল লাইট)" class="w-full sm:flex-1 px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
-                <input type="number" id="customWatt" placeholder="ওয়াট (W)" class="w-full sm:w-24 px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
+                <input type="text" id="customName" placeholder="অন্যান্য ডিভাইস বা মালামাল" class="w-full sm:flex-1 px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
+                <input type="number" id="customWatt" placeholder="ওয়াট (W) [না থাকলে 0]" class="w-full sm:w-32 px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
                 <button onclick="addNewCustomItem()" class="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-xl text-xs transition shadow-lg">সংরক্ষণ করুন</button>
             </div>
         </div>
 
         <!-- Selected Items in Current Room -->
         <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-2xl shadow-xl backdrop-blur-md space-y-4">
-            <h2 id="activeRoomTitle" class="font-bold text-base text-emerald-400 border-b border-slate-700 pb-2">🛠️ রুম ১ এর নির্বাচিত লোড তালিকা</h2>
+            <h2 id="activeRoomTitle" class="font-bold text-base text-emerald-400 border-b border-slate-700 pb-2">🛠️ রুম ১ এর নির্বাচিত লোড ও মালামাল তালিকা</h2>
             <div id="roomActiveItems" class="space-y-3">
-                <p class="text-xs text-slate-400 italic">উপরের ড্রপডাউন থেকে ডিভাইস সিলেক্ট করে এখানে যুক্ত করুন।</p>
+                <p class="text-xs text-slate-400 italic">উপরের ড্রপডাউন থেকে ডিভাইস বা মালামাল সিলেক্ট করে এখানে যুক্ত করুন।</p>
             </div>
         </div>
 
@@ -160,6 +183,18 @@
             </div>
             <div id="historyContent" class="space-y-3 max-h-96 overflow-y-auto text-xs text-slate-300">
                 <p class="text-slate-400 italic">হিস্ট্রি লোড হচ্ছে...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutModal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-700 p-6 rounded-2xl max-w-sm w-full text-center space-y-4 shadow-2xl">
+            <h3 class="text-lg font-bold text-white">🚪 লগআউট নিশ্চিতকরণ</h3>
+            <p class="text-sm text-slate-400">আপনি কি সত্যিই একাউন্ট থেকে বের হতে চান?</p>
+            <div class="flex gap-3 pt-2">
+                <button onclick="closeLogoutModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-xl transition">No (না)</button>
+                <button onclick="logoutUser()" class="flex-1 py-2.5 bg-red-600 hover:bg-red-500 text-white font-medium rounded-xl transition">Yes (হ্যাঁ)</button>
             </div>
         </div>
     </div>
@@ -214,20 +249,21 @@
 
     <!-- JavaScript Logic -->
     <script>
+        // Proper separation: Actual electrical load items vs Accessories/Materials (0 watt)
         let availableItems = [
-            { name: "লাইট", watt: 15 },
-            { name: "ফ্যান", watt: 75 },
-            { name: "টিভি", watt: 120 },
-            { name: "ফ্রিজ", watt: 300 },
-            { name: "এসি", watt: 1500 },
-            { name: "রাইস কুকার", watt: 1000 },
-            { name: "আয়রন", watt: 1000 },
-            { name: "ওয়াশিং মেশিন", watt: 500 },
-            { name: "২ পিন সকেট", watt: 100 },
-            { name: "৩ পিন মাল্টি সকেট", watt: 500 },
-            { name: "সুইচ ও বোর্ড", watt: 10 },
-            { name: "সিলিং রোজ", watt: 15 },
-            { name: "পিভিসি ১৪ মিলি পাইপ ও স্ক্রু", watt: 5 }
+            { name: "লাইট", watt: 15, isLoad: true },
+            { name: "ফ্যান", watt: 75, isLoad: true },
+            { name: "টিভি", watt: 120, isLoad: true },
+            { name: "ফ্রিজ", watt: 300, isLoad: true },
+            { name: "এসি", watt: 1500, isLoad: true },
+            { name: "রাইস কুকার", watt: 1000, isLoad: true },
+            { name: "আয়রন", watt: 1000, isLoad: true },
+            { name: "ওয়াশিং মেশিন", watt: 500, isLoad: true },
+            { name: "২ পিন সকেট", watt: 100, isLoad: true },
+            { name: "৩ পিন মাল্টি সকেট", watt: 500, isLoad: true },
+            { name: "সুইচ ও বোর্ড", watt: 0, isLoad: false },
+            { name: "সিলিং রোজ", watt: 0, isLoad: false },
+            { name: "পিভিসি ১৪ মিলি পাইপ ও স্ক্রু", watt: 0, isLoad: false }
         ];
 
         const marketMCBs = [2, 4, 8, 10, 12, 16, 20, 25, 32, 40, 50, 63];
@@ -237,6 +273,20 @@
         let isRegisterMode = false;
 
         window.onload = function() {
+            // Splash screen animation execution
+            setTimeout(() => {
+                let bar = document.getElementById('splashBar');
+                if(bar) bar.style.width = '100%';
+            }, 100);
+
+            setTimeout(() => {
+                let splash = document.getElementById('splashScreen');
+                if(splash) {
+                    splash.classList.add('opacity-0');
+                    setTimeout(() => splash.remove(), 700);
+                }
+            }, 1200);
+
             renderDropdown();
             updateRoomSelector();
             history.pushState({page: 'home'}, '', window.location.href);
@@ -253,13 +303,14 @@
                         }
                     });
                 }
-            }, 500);
+            }, 600);
         };
 
         window.addEventListener('popstate', function (e) {
             const resultModal = document.getElementById('resultModal');
             const historyModal = document.getElementById('historyModal');
             const exitModal = document.getElementById('exitModal');
+            const logoutModal = document.getElementById('logoutModal');
             
             history.pushState({page: 'home'}, '', window.location.href);
 
@@ -269,6 +320,10 @@
             }
             if (!historyModal.classList.contains('hidden')) {
                 closeHistoryModal();
+                return;
+            }
+            if (!logoutModal.classList.contains('hidden')) {
+                closeLogoutModal();
                 return;
             }
             if (!exitModal.classList.contains('hidden')) {
@@ -352,7 +407,16 @@
             }
         }
 
+        function confirmLogout() {
+            document.getElementById('logoutModal').classList.remove('hidden');
+        }
+
+        function closeLogoutModal() {
+            document.getElementById('logoutModal').classList.add('hidden');
+        }
+
         function logoutUser() {
+            closeLogoutModal();
             window.signOut(window.auth).then(() => {
                 alert("লগআউট সফল হয়েছে!");
                 location.reload();
@@ -363,7 +427,7 @@
             const dropdown = document.getElementById('deviceDropdown');
             dropdown.innerHTML = `<option value="">-- ডিভাইস বা মালামাল সিলেক্ট করুন --</option>`;
             availableItems.forEach((item, index) => {
-                dropdown.innerHTML += `<option value="${index}">${item.name} (${item.watt}W)</option>`;
+                dropdown.innerHTML += `<option value="${index}">${item.name} ${item.watt > 0 ? '('+item.watt+'W)' : '(ম্যাটেরিয়াল)'}</option>`;
             });
         }
 
@@ -373,7 +437,7 @@
             if (selectedIndex === "") return;
 
             const item = availableItems[selectedIndex];
-            addItemToRoom(item.name, item.watt);
+            addItemToRoom(item.name, item.watt, item.isLoad);
             dropdown.value = "";
         }
 
@@ -384,14 +448,15 @@
 
         function addNewCustomItem() {
             const name = document.getElementById('customName').value.trim();
-            const watt = parseFloat(document.getElementById('customWatt').value);
+            const watt = parseFloat(document.getElementById('customWatt').value) || 0;
 
-            if (!name || isNaN(watt) || watt <= 0) {
-                alert("দয়া করে সঠিক নাম এবং ওয়াট লিখুন!");
+            if (!name) {
+                alert("দয়া করে সঠিক নাম লিখুন!");
                 return;
             }
 
-            availableItems.push({ name: name, watt: watt });
+            let isLoad = watt > 0;
+            availableItems.push({ name: name, watt: watt, isLoad: isLoad });
             document.getElementById('customName').value = '';
             document.getElementById('customWatt').value = '';
             document.getElementById('customSection').classList.add('hidden');
@@ -425,11 +490,11 @@
             renderActiveRoomItems();
         }
 
-        function addItemToRoom(name, defaultWatt) {
+        function addItemToRoom(name, defaultWatt, isLoad) {
             let items = roomsData[activeRoom].items;
             let exist = items.find(i => i.name === name);
             if (!exist) {
-                items.push({ name: name, watt: defaultWatt, qty: 1 });
+                items.push({ name: name, watt: defaultWatt, qty: 1, isLoad: isLoad });
             } else {
                 exist.qty += 1;
             }
@@ -446,11 +511,11 @@
 
         function renderActiveRoomItems() {
             const rObj = roomsData[activeRoom];
-            document.getElementById('activeRoomTitle').innerHTML = `🛠️ ${rObj.name} এর নির্বাচিত লোড তালিকা`;
+            document.getElementById('activeRoomTitle').innerHTML = `🛠️ ${rObj.name} এর নির্বাচিত লোড ও মালামাল তালিকা`;
             const container = document.getElementById('roomActiveItems');
             
             if (rObj.items.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400 italic">এই রুমে এখনো কোনো ডিভাইস যোগ করা হয়নি।</p>`;
+                container.innerHTML = `<p class="text-xs text-slate-400 italic">এই রুমে এখনো কোনো ডিভাইস বা মালামাল যোগ করা হয়নি।</p>`;
                 return;
             }
 
@@ -577,8 +642,13 @@
             let totalProjectWatts = 0;
             let reportHTML = "";
             let hasItem = false;
-            let totalSwithBoard = 0;
-            let totalPvcPipe = 0;
+            
+            // Material collection counters for shopping list
+            let totalSwitchBoard = 0;
+            let totalCeilingRose = 0;
+            let totalPipeScrew = 0;
+            let total2PinSocket = 0;
+            let total3PinSocket = 0;
 
             for (let key in roomsData) {
                 let r = roomsData[key];
@@ -589,8 +659,13 @@
                     r.items.forEach(i => {
                         let w = parseFloat(i.watt) || 0;
                         let q = parseInt(i.qty) || 1;
-                        let sub = w * q;
-                        rWatts += sub;
+                        
+                        // Strict check: Accessories with 0 watt or marked as non-load do not add to wattage
+                        let sub = 0;
+                        if (i.isLoad !== false && w > 0) {
+                            sub = w * q;
+                            rWatts += sub;
+                        }
 
                         let wireRec = "1.5 RM তার";
                         let nameLower = i.name.toLowerCase();
@@ -600,16 +675,20 @@
                             wireRec = "2.5 RM তার";
                         }
 
-                        if(nameLower.includes('বোর্ড') || nameLower.includes('সুইচ')) totalSwithBoard += q;
-                        if(nameLower.includes('পাইপ')) totalPvcPipe += q;
+                        // Accumulate material counts
+                        if (nameLower.includes('সুইচ') || nameLower.includes('বোর্ড')) totalSwitchBoard += q;
+                        if (nameLower.includes('সিলিং রোজ')) totalCeilingRose += q;
+                        if (nameLower.includes('পাইপ')) totalPipeScrew += q;
+                        if (nameLower.includes('২ পিন')) total2PinSocket += q;
+                        if (nameLower.includes('৩ পিন')) total3PinSocket += q;
 
                         rDetails += `
                             <div class="flex flex-col text-xs py-1.5 pl-3 border-b border-slate-800 gap-0.5">
                                 <div class="flex justify-between">
-                                    <span class="text-slate-300 font-medium">${i.name} (${q}টি × ${w}W)</span>
-                                    <span class="text-emerald-400 font-semibold">${sub} W</span>
+                                    <span class="text-slate-300 font-medium">${i.name} (${q}টি ${w > 0 ? '× '+w+'W' : ''})</span>
+                                    <span class="text-emerald-400 font-semibold">${sub > 0 ? sub + ' W' : 'ম্যাটেরিয়াল'}</span>
                                 </div>
-                                <div class="text-[11px] text-cyan-400">🔌 তারের সাইজ: <b>${wireRec}</b></div>
+                                ${sub > 0 ? `<div class="text-[11px] text-cyan-400">🔌 তারের সাইজ: <b>${wireRec}</b></div>` : ''}
                             </div>`;
                     });
 
@@ -635,7 +714,7 @@
             }
 
             if (!hasItem) {
-                alert("দয়া করে যেকোনো রুমে অন্তত একটি ডিভাইস যোগ করুন!");
+                alert("দয়া করে যেকোনো রুমে অন্তত একটি ডিভাইস বা মালামাল যোগ করুন!");
                 return;
             }
 
@@ -681,8 +760,13 @@
                         <li>মেইন সার্কিট ব্র্রেকার: <b>${mainMCB}</b> (১টি)</li>
                         ${useRccb ? `<li>RCCB প্রটেকশন: <b>${rccbRating}A, 30mA RCCB</b> (১টি)</li>` : ''}
                         <li>ডিস্ট্রিবিউশন বক্স (DB Box): ১টি</li>
-                        <li>পিভিসি ১৪ মিলি পাইপ ও স্ক্রু: পর্যাপ্ত পরিমাণ</li>
+                        <li>সুইচ ও বোর্ড: <b>${totalSwitchBoard > 0 ? totalSwitchBoard + 'টি' : 'প্রয়োজন অনুযায়ী'}</b></li>
+                        <li>সিলিং রোজ: <b>${totalCeilingRose > 0 ? totalCeilingRose + 'টি' : 'প্রয়োজন অনুযায়ী'}</b></li>
+                        <li>পিভিসি ১৪ মিলি পাইপ ও স্ক্রু: <b>পর্যাপ্ত পরিমাণ</b></li>
                     </ul>
+                    <div class="pt-2 border-t border-emerald-900/50 text-[10px] text-emerald-300 text-right">
+                        ডেভেলপার: Rakibul Islam Rakib (Dinajpur)
+                    </div>
                 </div>
             `;
 
