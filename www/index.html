@@ -9,6 +9,12 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap');
         body { font-family: 'Hind Siliguri', sans-serif; }
+        @media print {
+            body * { visibility: hidden; }
+            #resultModal, #resultModal * { visibility: visible; }
+            #resultModal { position: absolute; left: 0; top: 0; width: 100%; background: white !important; color: black !important; }
+            .no-print { display: none !important; }
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-blue-950 text-slate-100 min-h-screen pb-12">
@@ -47,7 +53,8 @@
             <h1 class="text-base sm:text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">⚡ স্মার্ট ইলেকট্রিক ক্যালকুলেটর</h1>
         </div>
         <div class="flex items-center gap-2">
-            <div id="userPhoneDisplay" class="text-xs text-emerald-400 font-medium bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700"></div>
+            <button onclick="openHistoryModal()" class="text-[11px] bg-blue-900/60 border border-blue-600 text-blue-300 px-2.5 py-1.5 rounded-lg">📁 হিস্ট্রি</button>
+            <div id="userPhoneDisplay" class="text-xs text-emerald-400 font-medium bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 hidden sm:block"></div>
             <button onclick="logoutUser()" class="text-[11px] text-red-400 bg-red-950/40 px-2.5 py-1.5 rounded-lg border border-red-900/50">লগআউট</button>
         </div>
     </header>
@@ -55,14 +62,17 @@
     <!-- Sidebar Menu -->
     <div id="sidebar" class="fixed inset-y-0 left-0 w-80 bg-slate-900 border-r border-slate-800 z-50 transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
         <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-950">
-            <h2 class="font-bold text-blue-400 text-base">🛠 বাজারের MCB রেটিং তালিকা</h2>
+            <h2 class="font-bold text-blue-400 text-base">🛠 কাজের গাইড ও স্ট্যান্ডার্ড</h2>
             <button onclick="toggleSidebar(false)" class="text-slate-400 hover:text-white p-1">✕</button>
         </div>
         <div class="p-4 overflow-y-auto space-y-3 text-xs text-slate-300 flex-1">
             <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700 space-y-1">
                 <h3 class="font-bold text-blue-300 text-sm">বাজারের স্ট্যান্ডার্ড MCB সাইজ:</h3>
                 <p class="text-slate-300 font-mono">2A, 4A, 8A, 10A, 12A, 16A, 20A, 25A, 32A, 40A, 50A, 63A</p>
-                <p class="text-[11px] text-slate-400 pt-1">লোড অনুযায়ী নিখুঁত ব্র্রেকার ও তারের সাইজ অটোমেটিক নির্ধারিত হয়।</p>
+            </div>
+            <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700 space-y-1">
+                <h3 class="font-bold text-blue-300 text-sm">তারের মাপের নিয়ম:</h3>
+                <p class="text-slate-300">লাইট-ফ্যান: 1.5 RM<br>ফ্রিজ-সকেট: 2.5 RM<br>এসি/রাইস কুকার: 4.0 RM (DB থেকে সরাসরি)</p>
             </div>
         </div>
     </div>
@@ -71,6 +81,16 @@
     <!-- Main Container -->
     <main class="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
         
+        <!-- Quick Presets Section -->
+        <div class="bg-slate-800/80 border border-slate-700 p-4 rounded-2xl shadow-xl backdrop-blur-md space-y-2">
+            <h2 class="font-bold text-xs text-amber-400 uppercase tracking-wider">⚡ এক ক্লিকে প্রিসেট লোড (Quick Presets)</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <button onclick="loadPreset('1bed')" class="py-2 px-3 bg-slate-900 hover:bg-slate-700 border border-slate-600 rounded-xl text-xs text-emerald-400 font-medium transition">১ বেডরুম ফ্ল্যাট সেট</button>
+                <button onclick="loadPreset('2bed')" class="py-2 px-3 bg-slate-900 hover:bg-slate-700 border border-slate-600 rounded-xl text-xs text-emerald-400 font-medium transition">২ বেডরুম ফ্ল্যাট সেট</button>
+                <button onclick="loadPreset('heavy')" class="py-2 px-3 bg-slate-900 hover:bg-slate-700 border border-slate-600 rounded-xl text-xs text-amber-400 font-medium transition">এসি ও হেভি লোড সেট</button>
+            </div>
+        </div>
+
         <!-- Room Setup Section -->
         <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-2xl shadow-xl backdrop-blur-md space-y-3">
             <h2 class="font-bold text-base text-blue-400 border-b border-slate-700 pb-2">🏠 ঘরের সংখ্যা ও রুম নির্বাচন</h2>
@@ -93,16 +113,13 @@
         <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-2xl shadow-xl backdrop-blur-md space-y-4">
             <h2 class="font-bold text-base text-blue-400 border-b border-slate-700 pb-2">💡 ডিভাইস নির্বাচন করুন</h2>
             
-            <!-- Dropdown Selection Section -->
             <div class="flex gap-2 items-center">
                 <select id="deviceDropdown" onchange="onDeviceSelect()" class="flex-1 px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white">
                     <option value="">-- ডিভাইস সিলেক্ট করুন --</option>
                 </select>
-                <!-- Plus Button to toggle Custom Add Section -->
                 <button onclick="toggleCustomSection()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-lg transition shadow-lg" title="নতুন ডিভাইস যোগ করুন">➕</button>
             </div>
 
-            <!-- Custom Add Item Section -->
             <div id="customSection" class="pt-3 border-t border-slate-700 flex flex-col sm:flex-row gap-2 items-center bg-slate-900/60 p-3 rounded-xl border border-slate-700 hidden">
                 <input type="text" id="customName" placeholder="অন্যান্য ডিভাইস (যেমন: ওভেন)" class="w-full sm:flex-1 px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
                 <input type="number" id="customWatt" placeholder="ওয়াট (W)" class="w-full sm:w-24 px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
@@ -135,12 +152,28 @@
     <!-- Separate Result Page Modal -->
     <div id="resultModal" class="fixed inset-0 bg-slate-950 z-50 overflow-y-auto p-4 sm:p-8 hidden">
         <div class="max-w-2xl mx-auto bg-slate-900 border border-slate-700 p-6 rounded-3xl shadow-2xl space-y-6">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-4">
-                <h2 class="text-xl font-bold text-amber-400">📓 কমপ্লিট নোটবুক রিপোর্ট</h2>
-                <button onclick="closeResultPage()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm">✕ বন্ধ করুন</button>
+            <div class="flex justify-between items-center border-b border-slate-800 pb-4 no-print">
+                <h2 class="text-xl font-bold text-amber-400">📓 কমপ্লিট নোটবুক রিপোর্ট ও শপিং লিস্ট</h2>
+                <div class="flex gap-2">
+                    <button onclick="window.print()" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold">🖨️️ প্রিন্ট / PDF</button>
+                    <button onclick="closeResultPage()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm">✕ বন্ধ করুন</button>
+                </div>
             </div>
             <div id="fullReportContent" class="space-y-4 text-sm text-slate-300">
-                <!-- Detailed calculations -->
+                <!-- Detailed calculations & shopping list -->
+            </div>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="historyModal" class="fixed inset-0 bg-slate-950 z-50 overflow-y-auto p-4 hidden">
+        <div class="max-w-xl mx-auto bg-slate-900 border border-slate-700 p-6 rounded-3xl shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h2 class="text-lg font-bold text-blue-400">📁 সেভ করা আগের হিসাবসমূহ</h2>
+                <button onclick="closeHistoryModal()" class="text-slate-400 hover:text-white px-2 py-1 bg-slate-800 rounded-lg">✕ বন্ধ</button>
+            </div>
+            <div id="historyContent" class="space-y-3 max-h-96 overflow-y-auto text-xs text-slate-300">
+                <p class="text-slate-400 italic">হিস্ট্রি লোড হচ্ছে...</p>
             </div>
         </div>
     </div>
@@ -161,7 +194,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyAi_Lz0IpbsTpM7MaLr42vVjbwquqXtgL0",
@@ -185,6 +218,9 @@
         window.onAuthStateChanged = onAuthStateChanged;
         window.collection = collection;
         window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.query = query;
+        window.where = where;
         window.serverTimestamp = serverTimestamp;
     </script>
 
@@ -210,8 +246,6 @@
         window.onload = function() {
             renderDropdown();
             updateRoomSelector();
-            
-            // Push initial history state for back button trapping
             history.pushState({page: 'home'}, '', window.location.href);
 
             setTimeout(() => {
@@ -229,19 +263,48 @@
             }, 500);
         };
 
-        // Proper Back Button Handling without accidental exits
+        // Quick Presets Function
+        function loadPreset(type) {
+            if (type === '1bed') {
+                roomsData = {
+                    0: { name: "বেডরুম", items: [{name: "লাইট", watt: 15, qty: 2}, {name: "ফ্যান", watt: 75, qty: 1}, {name: "টিভি", watt: 120, qty: 1}] },
+                    1: { name: "কিচেন ও ডাইনিং", items: [{name: "লাইট", watt: 15, qty: 1}, {name: "রাইস কুকার", watt: 1000, qty: 1}, {name: "ফ্রিজ", watt: 300, qty: 1}] }
+                };
+                document.getElementById('roomCountInput').value = 2;
+            } else if (type === '2bed') {
+                roomsData = {
+                    0: { name: "মাস্টার বেডরুম", items: [{name: "লাইট", watt: 15, qty: 2}, {name: "ফ্যান", watt: 75, qty: 1}, {name: "এসি", watt: 1500, qty: 1}] },
+                    1: { name: "চাইল্ড বেডরুম", items: [{name: "লাইট", watt: 15, qty: 2}, {name: "ফ্যান", watt: 75, qty: 1}] },
+                    2: { name: "ড্রয়িং ও কিচেন", items: [{name: "লাইট", watt: 15, qty: 3}, {name: "টিভি", watt: 120, qty: 1}, {name: "ফ্রিজ", watt: 300, qty: 1}, {name: "রাইস কুকার", watt: 1000, qty: 1}] }
+                };
+                document.getElementById('roomCountInput').value = 3;
+            } else if (type === 'heavy') {
+                roomsData = {
+                    0: { name: "হেভি লোড রুম", items: [{name: "এসি", watt: 1500, qty: 2}, {name: "রাইস কুকার", watt: 1000, qty: 1}, {name: "ওয়াশিং মেশিন", watt: 500, qty: 1}] }
+                };
+                document.getElementById('roomCountInput').value = 1;
+            }
+            activeRoom = 0;
+            updateRoomSelector();
+            renderActiveRoomItems();
+            alert("প্রিসেট লোড সফলভাবে সেট করা হয়েছে!");
+        }
+
         window.addEventListener('popstate', function (e) {
             const resultModal = document.getElementById('resultModal');
+            const historyModal = document.getElementById('historyModal');
             const exitModal = document.getElementById('exitModal');
             
-            // Re-push state to maintain history trap
             history.pushState({page: 'home'}, '', window.location.href);
 
             if (!resultModal.classList.contains('hidden')) {
                 closeResultPage();
                 return;
             }
-
+            if (!historyModal.classList.contains('hidden')) {
+                closeHistoryModal();
+                return;
+            }
             if (!exitModal.classList.contains('hidden')) {
                 closeExitModal();
                 return;
@@ -255,7 +318,6 @@
         }
 
         function exitApp() {
-            // Allow exit when Yes is clicked in confirmation dialog
             window.removeEventListener('popstate', arguments.callee);
             if (navigator.app && navigator.app.exitApp) {
                 navigator.app.exitApp();
@@ -457,16 +519,62 @@
                     roomsData: roomsData,
                     timestamp: window.serverTimestamp()
                 });
-                console.log("ডেটা ফায়ারবেসে সফলভাবে সেভ হয়েছে!");
             } catch (e) {
                 console.error("ডেটা সেভ করতে সমস্যা হয়েছে: ", e);
             }
+        }
+
+        async function openHistoryModal() {
+            const modal = document.getElementById('historyModal');
+            const content = document.getElementById('historyContent');
+            modal.classList.remove('hidden');
+            content.innerHTML = `<p class="text-slate-400 italic">লোড হচ্ছে...</p>`;
+
+            try {
+                let currentUser = window.auth.currentUser;
+                if (!currentUser) {
+                    content.innerHTML = `<p class="text-red-400">দয়া করে প্রথমে লগইন করুন!</p>`;
+                    return;
+                }
+                let userPhone = currentUser.email.split('@')[0];
+                const q = query(collection(window.db, "electrical_calculations"), where("userPhone", "==", userPhone));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    content.innerHTML = `<p class="text-slate-400 italic">কোনো আগের হিস্ট্রি পাওয়া যায়নি।</p>`;
+                    return;
+                }
+
+                content.innerHTML = '';
+                querySnapshot.forEach((doc) => {
+                    let data = doc.data();
+                    let dateStr = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString('bn-BD') : 'তারিখ নেই';
+                    content.innerHTML += `
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
+                            <div class="flex justify-between text-blue-400 font-bold">
+                                <span>সর্বমোট লোড: ${data.totalWatts} W</span>
+                                <span class="text-emerald-400">${data.totalAmps.toFixed(1)} A</span>
+                            </div>
+                            <p class="text-[11px] text-slate-400">সময়: ${dateStr}</p>
+                        </div>
+                    `;
+                });
+            } catch (e) {
+                content.innerHTML = `<p class="text-red-400">হিস্ট্রি লোড করতে সমস্যা হয়েছে।</p>`;
+            }
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('historyModal').classList.add('hidden');
         }
 
         function openResultPage() {
             let totalProjectWatts = 0;
             let reportHTML = "";
             let hasItem = false;
+            let total15RMCount = 0;
+            let total25RMCount = 0;
+            let total4RMCount = 0;
 
             for (let key in roomsData) {
                 let r = roomsData[key];
@@ -480,12 +588,16 @@
                         let sub = w * q;
                         rWatts += sub;
 
-                        let wireRec = "1.5 RM তার (কম লোড সার্কিট)";
+                        let wireRec = "1.5 RM তার";
                         let nameLower = i.name.toLowerCase();
                         if (nameLower.includes('এসি') || nameLower.includes('রাইস কুকার') || nameLower.includes('ওভেন') || nameLower.includes('মোটর') || sub > 1000) {
-                            wireRec = "4.0 RM তার (ভারী লোড সার্কিট - DB থেকে সরাসরি)";
+                            wireRec = "4.0 RM তার (DB থেকে সরাসরি)";
+                            total4RMCount += q;
                         } else if (nameLower.includes('ফ্রিজ') || nameLower.includes('ওয়াশিং') || nameLower.includes('আয়রন') || sub > 500) {
-                            wireRec = "2.5 RM তার (মাঝারি লোড সার্কিট)";
+                            wireRec = "2.5 RM তার";
+                            total25RMCount += q;
+                        } else {
+                            total15RMCount += q;
                         }
 
                         rDetails += `
@@ -499,7 +611,7 @@
                     });
 
                     let roomAmps = rWatts / 220;
-                    let roomMCB = "6A MCB";
+                    let roomMCB = "2A MCB";
                     for (let mcb of marketMCBs) {
                         if (roomAmps * 1.25 <= mcb) { roomMCB = mcb + "A MCB"; break; }
                         roomMCB = "63A+ MCB";
@@ -531,8 +643,8 @@
             else if (totalAmps > 25) mainWire = "6.0 RM";
             else if (totalAmps > 15) mainWire = "4.0 RM";
 
-            let mainMCBVal = 6;
-            let mainMCB = "6A MCB";
+            let mainMCBVal = 2;
+            let mainMCB = "2A MCB";
             for (let mcb of marketMCBs) {
                 if (totalAmps * 1.25 <= mcb) { 
                     mainMCBVal = mcb;
@@ -543,15 +655,35 @@
                 mainMCB = "63A+ MCB";
             }
 
-            let rccbRating = 25;
-            if (mainMCBVal <= 16) rccbRating = 25;
+            let rccbRating = 16;
+            if (mainMCBVal <= 6) rccbRating = 16;
+            else if (mainMCBVal <= 16) rccbRating = 16;
             else if (mainMCBVal <= 25) rccbRating = 25;
             else if (mainMCBVal <= 32) rccbRating = 40;
-            else if (mainMCBVal <= 50) rccbRating = 63;
             else rccbRating = 63;
 
             const useRccb = document.getElementById('useRccb').checked;
             let rccbText = useRccb ? `হ্যাঁ (${rccbRating}A, 30mA RCCB)` : "প্রযোজ্য নয়";
+
+            // Earthing recommendation
+            let earthWire = totalAmps > 25 ? "4.0 RM আর্থিং তার" : "2.5 RM আর্থিং তার";
+
+            // Material Shopping List Estimation
+            let shoppingListHTML = `
+                <div class="bg-emerald-950/40 p-4 rounded-2xl border border-emerald-500/30 space-y-2">
+                    <h3 class="font-bold text-sm text-emerald-400 border-b border-emerald-900 pb-1">🛒 মালামাল ও শপিংয়ের রেডি তালিকা:</h3>
+                    <ul class="list-disc list-inside text-xs space-y-1 text-slate-300">
+                        <li>মেইন ইনপুট তার (মিটার থেকে DB): <b>${mainWire}</b> ক্যাবল</li>
+                        <li>লাইট ও ফ্যানের জন্য: <b>1.5 RM তার</b></li>
+                        <li>সকেট ও ফ্রিজের জন্য: <b>2.5 RM তার</b></li>
+                        <li>হেভি লোডের জন্য (এসি/কুকার): <b>4.0 RM তার</b></li>
+                        <li>মূল আর্থিং ক্যাবল: <b>${earthWire}</b></li>
+                        <li>মেইন সার্কিট ব্র্রেকার: <b>${mainMCB}</b> (১টি)</li>
+                        ${useRccb ? `<li>RCCB প্রটেকশন: <b>${rccbRating}A, 30mA RCCB</b> (১টি)</li>` : ''}
+                        <li>ডিস্ট্রিবিউশন বক্স (DB Box): ১টি (উপযুক্ত ওয়ে অব সার্কিট সহ)</li>
+                    </ul>
+                </div>
+            `;
 
             let summaryBox = `
                 <div class="bg-blue-950/60 p-4 rounded-2xl border border-blue-500/30 space-y-2">
@@ -561,12 +693,15 @@
                         <div class="flex justify-between"><span>মিটার থেকে DB বক্সের তার:</span><span class="font-bold text-emerald-400">${mainWire}</span></div>
                         <div class="flex justify-between"><span>মেইন MCB (বাজারের সাইজ):</span><span class="font-bold text-purple-400">${mainMCB}</span></div>
                         <div class="flex justify-between"><span>RCCB প্রটেকশন:</span><span class="font-bold text-indigo-400">${rccbText}</span></div>
+                        <div class="flex justify-between"><span>আর্থিং রিকমেন্ডেশন:</span><span class="font-bold text-amber-400">${earthWire}</span></div>
                     </div>
                 </div>
             `;
 
-            document.getElementById('fullReportContent').innerHTML = summaryBox + reportHTML;
+            document.getElementById('fullReportContent').innerHTML = summaryBox + shoppingListHTML + reportHTML;
             document.getElementById('resultModal').classList.remove('hidden');
+
+            saveResultToFirestore(totalProjectWatts, totalAmps);
         }
 
         function closeResultPage() {
